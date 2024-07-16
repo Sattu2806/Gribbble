@@ -1,6 +1,7 @@
 'use client'
 import React, { useRef, useState } from 'react'
-import UploadNav from './_components/UploadNav'
+import UploadNav from './UploadNav'
+import Firstmedia from './Firstmedia'
 
 type Props = {}
 
@@ -12,12 +13,35 @@ enum STEPS {
 const UploadComponent = (props: Props) => {
     const [step, setStep] = useState(STEPS.UPLOAD_MEDIA)
     const fileInputRef = useRef<HTMLInputElement | null> (null)
+    const [LocalUrl, setLocalUrl] = useState<string>()
+    const [fileType, setFileType] = useState<"image" | "video">("image")
+    const [title, setTitle] = useState<string>()
+
 
     const onNext = () => {
         setStep((value) => value + 1)
     }
 
+
+    const handleFile = (file:File) => {
+        const reader = new FileReader()
+        if(file.type.startsWith('image/')){
+            setFileType('image')
+        }else if(file.type.startsWith('video/')){
+            setFileType('video')
+        }
+        reader.onload = async () => {
+            if(reader.result){
+                setLocalUrl(reader.result as string)
+            }
+        }
+        reader.readAsDataURL(file)
+    }
+
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(event.target.files && event.target.files.length > 0){
+            handleFile(event.target.files[0])
+        }
         onNext()
     }
 
@@ -30,6 +54,9 @@ const UploadComponent = (props: Props) => {
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
         event.stopPropagation()
+        if(event.dataTransfer.files && event.dataTransfer.files.length > 0){
+            handleFile(event.dataTransfer.files[0])
+        }
         onNext()
     }
     
@@ -92,7 +119,16 @@ const UploadComponent = (props: Props) => {
                         </div>
                     )}
                     {step === STEPS.OTHER_STUFF && (
-                        <div>Step2</div>
+                        <div>
+                            <div>
+                                <div className='w-9/12 mx-auto'>
+                                    <textarea name="" id="" cols={30} rows={1} placeholder='Give me a name' className='focus:outline-none text-4xl font-bold' value={title} onChange={(e) => setTitle(e.target.value)}></textarea>
+                                </div>
+                            </div>
+                            <div>
+                                <Firstmedia type={fileType} url={LocalUrl}/>
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import React from 'react'
-import UploadComponent from '../UploadComponent'
+import UploadComponent from '../_components/UploadComponent'
 
 type Props = {}
 
