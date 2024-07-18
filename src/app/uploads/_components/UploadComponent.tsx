@@ -2,6 +2,7 @@
 import React, { useRef, useState } from 'react'
 import UploadNav from './UploadNav'
 import Firstmedia from './Firstmedia'
+import TextComp from './TextComponent/TextComp'
 
 type Props = {}
 
@@ -11,7 +12,7 @@ enum STEPS {
 }
 
 const UploadComponent = (props: Props) => {
-    const [step, setStep] = useState(STEPS.UPLOAD_MEDIA)
+    const [step, setStep] = useState(STEPS.OTHER_STUFF)
     const fileInputRef = useRef<HTMLInputElement | null> (null)
     const [LocalUrl, setLocalUrl] = useState<string>()
     const [fileType, setFileType] = useState<"image" | "video">("image")
@@ -125,8 +126,9 @@ const UploadComponent = (props: Props) => {
                                     <textarea name="" id="" cols={30} rows={1} placeholder='Give me a name' className='focus:outline-none text-4xl font-bold' value={title} onChange={(e) => setTitle(e.target.value)}></textarea>
                                 </div>
                             </div>
-                            <div>
+                            <div className='pb-20'>
                                 <Firstmedia type={fileType} url={LocalUrl}/>
+                                <TextComp/>
                             </div>
                         </div>
                     )}
