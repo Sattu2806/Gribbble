@@ -7,6 +7,7 @@ import Link from "@tiptap/extension-link"
 import {ChevronDown} from "lucide-react"
 import HeadingTextMenu from './HeadingTextMenu'
 import TextEditor from './TextEditor'
+import useHeadingStore from '@/hooks/use-headingtool'
 
 type Props = {}
 
@@ -54,7 +55,8 @@ export default EditorComp
 
 
 const EditorToolBar = ({editor}:{editor:Editor}) => {
-    const [selectedText, setSelectedText] = useState<string>('Body')
+    const [open, setOpen] = useState<boolean>(false)
+    const {selectedText} = useHeadingStore()
     return(
         <div className='absolute right-0 -top-28 w-[300px] bg-white p-4'>
             <div>
@@ -66,7 +68,7 @@ const EditorToolBar = ({editor}:{editor:Editor}) => {
                 </div>
                 <div>
                     <span className='text-sm font-semibold'>Text</span>
-                    <div className='mt-5'>
+                    <div onClick={() => setOpen(!open)} className='mt-5'>
                         <div className='p-3 border-2 rounded-lg relative'>
                             <div className='flex items-center justify-between cursor-pointer'>
                                 <span className='text-sm text-neutral-500'>{selectedText}</span>
@@ -74,7 +76,7 @@ const EditorToolBar = ({editor}:{editor:Editor}) => {
                                     <ChevronDown size={14}/>
                                 </span>
                             </div>
-                            {/* <HeadingTextMenu/> */}
+                            <HeadingTextMenu editor={editor} open={open} setOpen={setOpen}/>
                         </div>
                         <TextEditor editor={editor}/>
                     </div>
