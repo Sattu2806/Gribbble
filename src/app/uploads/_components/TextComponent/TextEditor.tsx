@@ -38,7 +38,7 @@ const TextEditor = ({editor}: Props) => {
         return
     }
   return (
-    <div className='mt-6 border-[1px] rounded-lg pb-10'>
+    <div className='mt-6 pb-10'>
         <div className='flex items-center justify-around'>
             <button 
                 type='button'

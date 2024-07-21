@@ -3,6 +3,9 @@ import React, { useRef, useState } from 'react'
 import UploadNav from './UploadNav'
 import Firstmedia from './Firstmedia'
 import TextComp from './TextComponent/TextComp'
+import { useMenuStore } from '@/hooks/use-menu'
+import SideBarMenu from './Menu/SideBarMenu'
+
 
 type Props = {}
 
@@ -17,6 +20,8 @@ const UploadComponent = (props: Props) => {
     const [LocalUrl, setLocalUrl] = useState<string>()
     const [fileType, setFileType] = useState<"image" | "video">("image")
     const [title, setTitle] = useState<string>()
+    const {isMenuOpen, ontoggleMenu} = useMenuStore()
+    
 
 
     const onNext = () => {
@@ -75,8 +80,10 @@ const UploadComponent = (props: Props) => {
     }
   return (
     <div>
-        <div className='w-full'>
+        <div className={`transition-all ease-in duration-200 ${isMenuOpen ? "w-[calc(100vw-400px)]" :"w-full"}`}>
             <UploadNav/>
+            <button onClick={ontoggleMenu}>Toggle</button>
+            <SideBarMenu/>
             <div className='content-container pt-10'>
                 <div>
                     {step === STEPS.UPLOAD_MEDIA && (
