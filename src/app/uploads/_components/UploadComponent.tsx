@@ -5,6 +5,16 @@ import Firstmedia from './Firstmedia'
 import TextComp from './TextComponent/TextComp'
 import { useMenuStore } from '@/hooks/use-menu'
 import SideBarMenu from './Menu/SideBarMenu'
+import useUploadDataStore from '@/hooks/use-upload-data'
+import {v4 as uuidv4} from "uuid"
+import useEditorStore from '@/hooks/use-editor'
+import {Editor, EditorContent, useEditor} from "@tiptap/react"
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import TextAlign from "@tiptap/extension-text-align"
+import Link from "@tiptap/extension-link"
+import EditorComp from './TextComponent/EditorComp'
+import MainTextComp from './TextComponent/MainTextComp'
 
 
 type Props = {}
@@ -15,12 +25,14 @@ enum STEPS {
 }
 
 const UploadComponent = (props: Props) => {
-    const [step, setStep] = useState(STEPS.OTHER_STUFF)
+    const [step, setStep] = useState(STEPS.UPLOAD_MEDIA)
     const fileInputRef = useRef<HTMLInputElement | null> (null)
     const [LocalUrl, setLocalUrl] = useState<string>()
     const [fileType, setFileType] = useState<"image" | "video">("image")
     const [title, setTitle] = useState<string>()
     const {isMenuOpen, ontoggleMenu} = useMenuStore()
+    const {entries, addEntry} = useUploadDataStore()
+    const {createEditor} = useEditorStore()
     
 
 
@@ -31,17 +43,50 @@ const UploadComponent = (props: Props) => {
 
     const handleFile = (file:File) => {
         const reader = new FileReader()
-        if(file.type.startsWith('image/')){
-            setFileType('image')
-        }else if(file.type.startsWith('video/')){
-            setFileType('video')
-        }
+        const id = uuidv4()
         reader.onload = async () => {
             if(reader.result){
+                if(file.type.startsWith('image/')){
+                    setFileType('image')
+                    addEntry(id,'image',reader.result as string,'','large')
+                }else if(file.type.startsWith('video/')){
+                    setFileType('video')
+                    addEntry(id,'video',reader.result as string,'','large')
+                }
                 setLocalUrl(reader.result as string)
+                addEditor()
             }
         }
         reader.readAsDataURL(file)
+    }
+
+    const addEditor = () => {
+        const newEditor = createEditor({
+            extensions:[
+                StarterKit,Underline,
+                TextAlign.configure({
+                    types: ['heading', 'paragraph'],
+                }),
+                Link.configure({
+                    openOnClick: true,
+                    defaultProtocol:'https'
+                })
+            ],
+            editorProps:{
+                attributes:{
+                    class:'prose w-full leading-3 p-5 focus:outline-[2px] focus:border-[2px] focus:border-pink-500 focus:outline-pink-500 rounded-xl transition-all ease-in duration-150 prose-a:font-semibold prose-a:text-pink-500 prose:leading-loose'
+                }
+            },
+            content: `          
+            <div>
+                <p>
+                  Write about post...
+                </p>
+            </div>
+            `
+        })
+        
+        addEntry(newEditor,'text')
     }
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +123,8 @@ const UploadComponent = (props: Props) => {
         event.preventDefault()
         event.stopPropagation()
     }
+
+    console.log("enteries", entries)
   return (
     <div>
         <div className={`transition-all ease-in duration-200 ${isMenuOpen ? "w-[calc(100vw-400px)]" :"w-full"}`}>
@@ -134,8 +181,18 @@ const UploadComponent = (props: Props) => {
                                 </div>
                             </div>
                             <div className='pb-20'>
-                                <Firstmedia type={fileType} url={LocalUrl}/>
-                                <TextComp/>
+                                {entries.map((entry,index) => {
+                                    if((entry.type === 'image' || entry.type === 'video' ) && index === 0){
+                                        return(
+                                            <Firstmedia key={entry.id} url={entry.content} type={entry.type}/>
+                                        )
+                                    } else if(entry.type === 'text'){
+                                        return(
+                                            <MainTextComp key={entry.id} entryId={entry.id}/>
+                                        )
+                                    }
+                                    return null
+                                })}
                             </div>
                         </div>
                     )}

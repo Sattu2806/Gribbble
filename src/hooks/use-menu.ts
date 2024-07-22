@@ -10,6 +10,9 @@ interface MenuStore {
     selectedMenu: Menu,
     setSelectedmenu:(menu:Menu) => void,
     getSelectedmenu: () => Menu,
+    selectedEntryId:string
+    setSelectedEntryId:(entryId:string) => void,
+    getSelectedEntryId:() => string
 }
 
 export const useMenuStore = create<MenuStore> ((set,get) => ({
@@ -17,7 +20,10 @@ export const useMenuStore = create<MenuStore> ((set,get) => ({
     onOpenMenu:() => set({isMenuOpen:true}),
     onCloseMenu:() => set({isMenuOpen:false}),
     ontoggleMenu:() => set({isMenuOpen: !get().isMenuOpen}),
-    selectedMenu:'text',
+    selectedMenu:'main',
     setSelectedmenu:(menu:Menu) => set({selectedMenu:menu}),
     getSelectedmenu:() => get().selectedMenu,
+    selectedEntryId:'',
+    setSelectedEntryId:(entryId:string) => set({selectedEntryId:entryId}),
+    getSelectedEntryId:() => get().selectedEntryId
 }))

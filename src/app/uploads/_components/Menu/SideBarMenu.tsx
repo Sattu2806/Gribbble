@@ -2,42 +2,70 @@ import React from 'react'
 import { useMenuStore } from '@/hooks/use-menu'
 import OtherMedia from '../OtherMedia'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { EditorToolBar } from '../TextComponent/EditorComp'
-import {useEditor} from "@tiptap/react"
+import { EditorToolBar } from '../TextComponent/EditorToolbar'
+import useEditorStore from '@/hooks/use-editor'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from "@tiptap/extension-text-align"
 import Link from "@tiptap/extension-link"
+import useUploadDataStore from '@/hooks/use-upload-data'
+
 
 type Props = {}
 
 const SideBarMenu = (props: Props) => {
-    const {isMenuOpen,selectedMenu, onCloseMenu,setSelectedmenu} = useMenuStore()
+    const {isMenuOpen,selectedMenu, onCloseMenu,setSelectedmenu, selectedEntryId} = useMenuStore()
+    const {createEditor} = useEditorStore()
+    const {entries, addEntry} = useUploadDataStore()
 
-    const editor = useEditor({
-        extensions:[
-            StarterKit,Underline,
-            TextAlign.configure({
-                types: ['heading', 'paragraph'],
-            }),
-            Link.configure({
-                openOnClick: true,
-                defaultProtocol:'https'
-            })
-        ],
-        editorProps:{
-            attributes:{
-                class:'prose w-full leading-3 p-5 focus:outline-[2px] focus:border-[2px] focus:border-pink-500 focus:outline-pink-500 rounded-xl transition-all ease-in duration-150 prose-a:font-semibold prose-a:text-pink-500 prose:leading-loose'
-            }
-        },
-        content: `          
-        <div>
-            <p>
-              Write about post...
-            </p>
-        </div>
-        `
-    })
+    const {getEditor} = useEditorStore()
+
+    const editor = getEditor(selectedEntryId)
+
+    const addEditor = (type:string) => {
+        let Content = ``
+        if(type === 'heading'){
+            Content = `            
+            <div>
+                <h1>Heading to write</h1>
+            </div>`
+        } else if(type === 'para-heading'){
+            Content = `            
+            <div>
+                <h2>Heading to write</h2>
+                <p>
+                  Write about post...
+                </p>
+            </div>`
+        } else if(type === 'para'){
+            Content = `            
+            <div>
+                <p>
+                  Write about post...
+                </p>
+            </div>`
+        }
+        const newEditor = createEditor({
+            extensions:[
+                StarterKit,Underline,
+                TextAlign.configure({
+                    types: ['heading', 'paragraph'],
+                }),
+                Link.configure({
+                    openOnClick: true,
+                    defaultProtocol:'https'
+                })
+            ],
+            editorProps:{
+                attributes:{
+                    class:'prose w-full leading-3 p-5 focus:outline-[2px] focus:border-[2px] focus:border-pink-500 focus:outline-pink-500 rounded-xl transition-all ease-in duration-150 prose-a:font-semibold prose-a:text-pink-500 prose:leading-loose'
+                }
+            },
+            content: Content
+        })
+        
+        addEntry(newEditor,'text')
+    }
 
     if(!editor){
         return null
@@ -240,6 +268,33 @@ const SideBarMenu = (props: Props) => {
             <div className={`${selectedMenu === 'text' ? "block" : 'hidden'} mt-5`}>
                 <button onClick={onCloseMenu} className='mb-5 text-sm'>Close</button>
                 <EditorToolBar editor={editor} />
+            </div>
+            <div className={`${selectedMenu === 'secondary-text' ? "block" : 'hidden'} mt-5`}>
+                <div onClick={() => setSelectedmenu('main')} className='absolute top-6 left-3 cursor-pointer'>
+                    <ChevronLeft size={20}/>
+                </div>
+                <div>
+                    <div onClick={() => addEditor('heading')}  className='bg-gray-50 p-2 mt-10'>
+                        <div className='p-2 text-xl flex items-center justify-center font-bold bg-white m-5 hover:bg-gray-200 cursor-pointer h-[150px]'>
+                            <span>Heading</span>
+                        </div>
+                    </div>
+                    <div onClick={() => addEditor('para-heading')}  className='bg-gray-50 p-2 mt-2'>
+                        <div className='p-2 text-xl flex flex-col items-center justify-center font-bold bg-white m-5 hover:bg-gray-200 cursor-pointer h-[150px]'>
+                            <p className='text-center pb-3'>Heading</p>
+                            <p className='text-xs font-normal text-center'>
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                            </p>
+                        </div>
+                    </div>
+                    <div onClick={() => addEditor('para')} className='bg-gray-50 p-2 mt-2'>
+                        <div className='p-2 text-xl flex flex-col items-center justify-center font-bold bg-white m-5 hover:bg-gray-200 cursor-pointer h-[150px]'>
+                            <p className='text-xs font-normal text-center'>
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

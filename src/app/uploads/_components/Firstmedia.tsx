@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 type Props = {
-    url:string | undefined
+    url:string | undefined | null
     type: 'video' | 'image'
 }
 
