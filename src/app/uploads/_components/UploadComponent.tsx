@@ -1,7 +1,7 @@
 'use client'
 import React, { useRef, useState } from 'react'
 import UploadNav from './UploadNav'
-import Firstmedia from './Firstmedia'
+import Firstmedia from './MediaComponents/Firstmedia'
 import TextComp from './TextComponent/TextComp'
 import { useMenuStore } from '@/hooks/use-menu'
 import SideBarMenu from './Menu/SideBarMenu'
@@ -15,6 +15,7 @@ import TextAlign from "@tiptap/extension-text-align"
 import Link from "@tiptap/extension-link"
 import EditorComp from './TextComponent/EditorComp'
 import MainTextComp from './TextComponent/MainTextComp'
+import ImageComponent from './MediaComponents/ImageComponent'
 
 
 type Props = {}
@@ -30,7 +31,7 @@ const UploadComponent = (props: Props) => {
     const [LocalUrl, setLocalUrl] = useState<string>()
     const [fileType, setFileType] = useState<"image" | "video">("image")
     const [title, setTitle] = useState<string>()
-    const {isMenuOpen, ontoggleMenu} = useMenuStore()
+    const {isMenuOpen} = useMenuStore()
     const {entries, addEntry} = useUploadDataStore()
     const {createEditor} = useEditorStore()
     
@@ -129,7 +130,6 @@ const UploadComponent = (props: Props) => {
     <div>
         <div className={`transition-all ease-in duration-200 ${isMenuOpen ? "w-[calc(100vw-400px)]" :"w-full"}`}>
             <UploadNav/>
-            <button onClick={ontoggleMenu}>Toggle</button>
             <SideBarMenu/>
             <div className='content-container pt-10'>
                 <div>
@@ -184,11 +184,15 @@ const UploadComponent = (props: Props) => {
                                 {entries.map((entry,index) => {
                                     if((entry.type === 'image' || entry.type === 'video' ) && index === 0){
                                         return(
-                                            <Firstmedia key={entry.id} url={entry.content} type={entry.type}/>
+                                            <Firstmedia key={entry.id} url={entry.content} type={entry.type} entryId={entry.id}/>
                                         )
                                     } else if(entry.type === 'text'){
                                         return(
                                             <MainTextComp key={entry.id} entryId={entry.id}/>
+                                        )
+                                    } else if(entry.type === 'image'){
+                                        return(
+                                            <ImageComponent key={entry.id} entryId={entry.id}/>
                                         )
                                     }
                                     return null

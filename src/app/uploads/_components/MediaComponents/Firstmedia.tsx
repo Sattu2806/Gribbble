@@ -1,12 +1,16 @@
+import { useMenuStore } from '@/hooks/use-menu'
 import React, { useEffect, useState } from 'react'
 
 type Props = {
+    entryId:string
     url:string | undefined | null
     type: 'video' | 'image'
 }
 
-const Firstmedia = ({url,type}: Props) => {
+const Firstmedia = ({url,type,entryId}: Props) => {
     const [clickedElement, setClickedElement] = useState<boolean>(false)
+    const {setSelectedEntryId, setSelectedmenu,onOpenMenu} = useMenuStore()
+
 
     useEffect(() => {
         const handleClickOutside = (event:MouseEvent) => {
@@ -44,7 +48,7 @@ const Firstmedia = ({url,type}: Props) => {
         </div>
         <div className='flex opacity-0 hover:opacity-100 transition-all duration-150 ease-in items-center mt-10'>
             <div className='line border-2 h-[1.5px] border-pink-500 w-full rounded-full'></div>
-            <button className='p-3 rounded-full bg-pink-500 flex items-center text-white'>
+            <button onClick={() => {setSelectedEntryId(entryId);setSelectedmenu('main');onOpenMenu()}} className='p-3 rounded-full bg-pink-500 flex items-center text-white'>
                 <svg
                     data-v-351edcb1=""
                     viewBox="0 0 24 24"

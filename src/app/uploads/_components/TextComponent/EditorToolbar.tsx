@@ -5,9 +5,13 @@ import TextEditor from './TextEditor'
 import useHeadingStore from '@/hooks/use-headingtool'
 import { useState } from "react"
 
-export const EditorToolBar = ({editor}:{editor:Editor}) => {
+export const EditorToolBar = ({editor}:{editor:Editor | null}) => {
     const [open, setOpen] = useState<boolean>(false)
     const {selectedText} = useHeadingStore()
+
+    if(!editor){
+        return null
+    }
     return(
         <div className=' bg-white'>
             <div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useMenuStore } from '@/hooks/use-menu'
-import OtherMedia from '../OtherMedia'
+import OtherMedia from '../MediaComponents/OtherMedia'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { EditorToolBar } from '../TextComponent/EditorToolbar'
 import useEditorStore from '@/hooks/use-editor'
@@ -9,6 +9,7 @@ import Underline from '@tiptap/extension-underline'
 import TextAlign from "@tiptap/extension-text-align"
 import Link from "@tiptap/extension-link"
 import useUploadDataStore from '@/hooks/use-upload-data'
+import {v4 as uuidv4} from 'uuid'
 
 
 type Props = {}
@@ -16,7 +17,7 @@ type Props = {}
 const SideBarMenu = (props: Props) => {
     const {isMenuOpen,selectedMenu, onCloseMenu,setSelectedmenu, selectedEntryId} = useMenuStore()
     const {createEditor} = useEditorStore()
-    const {entries, addEntry} = useUploadDataStore()
+    const {entries, addEntry,updateEntry,getEntry} = useUploadDataStore()
 
     const {getEditor} = useEditorStore()
 
@@ -67,9 +68,28 @@ const SideBarMenu = (props: Props) => {
         addEntry(newEditor,'text')
     }
 
-    if(!editor){
-        return null
+    const addImageComp = () => {
+        const id = uuidv4()
+        addEntry(id,'image',null,'','',selectedEntryId)
     }
+
+
+    const data = getEntry(selectedEntryId)
+
+    const updateAltText = (e:React.ChangeEvent<HTMLInputElement>) => {
+        updateEntry(selectedEntryId,data?.content!,e.target.value)
+    }
+
+
+    const MakeSmall = () => {
+        updateEntry(selectedEntryId,data?.content!,data?.extra1,'small')
+    }
+
+    const Makelarge = () => {
+        updateEntry(selectedEntryId,data?.content!,data?.extra1,'large')
+    }
+
+    
   return (
     <div className={`fixed top-0 w-[335px] right-0 z-50 bg-white shadow-xl h-full transition-all ease-in duration-200 ${isMenuOpen ? "translate-x-0" : "translate-x-[400px] opacity-0"}`}>
         <div className='p-2 px-10'>
@@ -93,7 +113,7 @@ const SideBarMenu = (props: Props) => {
                                     </span>
                                 </div>
                             </div>
-                            <div className='mt-3 text-sm'>
+                            <div onClick={addImageComp} className='mt-3 text-sm'>
                                 <div className='flex items-center justify-between hover:bg-neutral-100 rounded-lg py-2 px-1'>
                                     <div className='flex items-center justify-between space-x-3'>
                                         <span>
@@ -148,26 +168,27 @@ const SideBarMenu = (props: Props) => {
                     <div>
                         <span className='font-semibold'>Media</span>
                         <div className='mt-5'>
-                            <OtherMedia data={null} type='image' />
+                            <OtherMedia />
                             <div className='mt-7'>
                                 <label htmlFor="" className='font-medium'>Alt Text</label>
                                 <div className='mt-3'>
                                     <input 
                                         type="text"
-                                         className='outline-none bg-transparent focus:outline-none text-xl placeholder:text-[14px] break-words break-normal whitespace-pre focus:border-2 focus:border-pink-500 px-3 py-2 border-2 rounded-lg'
+                                         className='outline-none bg-transparent focus:outline-none placeholder:text-[14px] break-words break-normal whitespace-pre focus:border-2 focus:border-pink-500 px-3 py-2 border-2 rounded-lg text-base w-full'
                                          placeholder='Enter alt text'
+                                         onChange={updateAltText}
                                     />
                                 </div>
                             </div>
                             <div className='mt-7'>
                                 <label htmlFor="" className='font-medium'>layout</label>
                                 <div className='mt-3 grid grid-cols-2'>
-                                    <button className={`border-[2px] rounded-s-xl py-3 flex items-center justify-center `}>
+                                    <button onClick={MakeSmall} className={`border-[2px] rounded-s-xl py-3 flex items-center justify-center ${data?.extra2  === 'small' ? 'border-purple-500' : ''}`}>
                                         <span>
                                             <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor" xmlns="http://www.w3.org/2000/svg" svg-inline="" role="presentation" focusable="false" className="icon-12"><path fillRule="evenodd" clipRule="evenodd" d="M12.53.47a.75.75 0 010 1.06L9.534 4.527h1.856a.75.75 0 010 1.5h-3.64a.748.748 0 01-.777-.75V1.61a.75.75 0 011.5 0v1.857L11.47.47a.75.75 0 011.06 0zM1.61 6.972a.75.75 0 000 1.5h1.857L.47 11.47a.75.75 0 001.06 1.06l2.997-2.997v1.856a.75.75 0 001.5 0v-3.64a.748.748 0 00-.75-.777m-3.667 0h3.667z"></path></svg>
                                         </span>
                                     </button>
-                                    <button className={`border-[2px] rounded-e-xl py-3 flex items-center justify-center `}>
+                                    <button onClick={Makelarge} className={`border-[2px] rounded-e-xl py-3 flex items-center justify-center  ${data?.extra2  === 'large' ? 'border-purple-500' : ''}`}>
                                         <span>
                                             <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor" xmlns="http://www.w3.org/2000/svg" svg-inline="" role="presentation" focusable="false" className="icon-12"><path fillRule="evenodd" clipRule="evenodd" d="M12.53.47a.75.75 0 010 1.06L9.534 4.527h1.856a.75.75 0 010 1.5h-3.64a.748.748 0 01-.777-.75V1.61a.75.75 0 011.5 0v1.857L11.47.47a.75.75 0 011.06 0zM1.61 6.972a.75.75 0 000 1.5h1.857L.47 11.47a.75.75 0 001.06 1.06l2.997-2.997v1.856a.75.75 0 001.5 0v-3.64a.748.748 0 00-.75-.777m-3.667 0h3.667z"></path></svg>
                                         </span>
@@ -190,7 +211,7 @@ const SideBarMenu = (props: Props) => {
                     <div>
                         <span className='font-semibold'>Media</span>
                         <div className='mt-5'>
-                            <OtherMedia data={null} type='image' />
+                            <OtherMedia />
                             <div className='mt-7'>
                                 <label htmlFor="" className='font-medium'>Alt Text</label>
                                 <div className='mt-3'>
