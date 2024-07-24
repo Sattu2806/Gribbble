@@ -1,5 +1,6 @@
 import { useMenuStore } from '@/hooks/use-menu'
-import React, { useEffect, useState } from 'react'
+import useUploadDataStore from '@/hooks/use-upload-data'
+import React, { useEffect, useRef, useState } from 'react'
 
 type Props = {
     entryId:string
@@ -10,6 +11,56 @@ type Props = {
 const Firstmedia = ({url,type,entryId}: Props) => {
     const [clickedElement, setClickedElement] = useState<boolean>(false)
     const {setSelectedEntryId, setSelectedmenu,onOpenMenu} = useMenuStore()
+    const {getEntry,updateEntry} = useUploadDataStore()
+    const fileInputRef = useRef<HTMLInputElement | null> (null)
+    
+
+    console.log("entry", entryId)
+    const handleFile = (file:File) => {
+        const reader = new FileReader()
+        reader.onload = async () => {
+            if(reader.result){
+                updateEntry(entryId,reader.result as string,'','small')
+            }
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(event.target.files && event.target.files.length > 0){
+            handleFile(event.target.files[0])
+        }
+    }
+
+    const handleClick = () => {
+        if(fileInputRef.current){
+            fileInputRef.current.click()
+        }
+
+    }
+    
+    const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+        if(event.dataTransfer.files && event.dataTransfer.files.length > 0){
+            if(event.dataTransfer.files[0].type.startsWith('image/')){
+                handleFile(event.dataTransfer.files[0])
+            }
+        }
+    }
+    
+    const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+    }
+    const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+    }
+    const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+    }
 
 
     useEffect(() => {
@@ -27,10 +78,15 @@ const Firstmedia = ({url,type,entryId}: Props) => {
         }
     },[])
 
+
+    const entryData = getEntry(entryId)
   return (
     <div  className='mt-10 mb-5 px-5 flex flex-col'>
-        <div id='myDiv' onClick={() => setClickedElement(true)} className={`hover:border-[2px] transition-all duration-150 ease-in rounded-xl mx-auto ${clickedElement ? "border-2 border-pink-500"  :""}`}>
-            <div className={`object-cover flex items-center justify-center p-4 max-w-screen-lg transition-all duration-100 ease-in min-h-[400px] ${url ? "bg-gray-100":"bg-white"}  rounded-lg m-1`}>
+        <div id='myDiv' onClick={() => {setClickedElement(true);setSelectedmenu(type === 'image' ? 'image' : type === 'video' ? 'video' : 'main');setSelectedEntryId(entryId);onOpenMenu()}} className={`hover:border-[2px] transition-all duration-150 ease-in rounded-xl mx-auto ${clickedElement ? "border-2 border-pink-500"  :""} ${entryData?.extra2 === 'large' ? "max-w-screen-lg" :"max-w-screen-md"}`}>
+            <div onDrop={handleDrop}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver} className={`object-cover flex items-center justify-center p-4 max-w-screen-lg transition-all duration-100 ease-in min-h-[400px] ${!entryData?.content ? "bg-gray-100":"bg-white "}  rounded-lg m-1`}>
                 {url ? (
                     type === 'image' ? (
                         <img src={url} className='rounded-xl transition-all duration-75 ease-in w-full h-auto' />
@@ -38,10 +94,11 @@ const Firstmedia = ({url,type,entryId}: Props) => {
                         <video controls className='rounded-xl w-full h-auto' src={url}></video>
                     )
                 ):(
-                    <label htmlFor="" className='flex flex-col items-center justify-center min-h-[400px] aspect-video'>
+                    <label onClick={handleClick} htmlFor="" className='flex flex-col items-center justify-center min-h-[400px] aspect-video'>
                         <div className='text-center'>
                             Drag and drop an {type} , or click to Browse
                         </div>
+                        <input ref={fileInputRef} type="file" onChange={handleFileChange} accept='image/*' className='hidden' />
                     </label>
                 )}
             </div>

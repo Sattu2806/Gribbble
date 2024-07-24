@@ -40,7 +40,9 @@ const ImageComponent = ({entryId}: {entryId:string}) => {
         event.preventDefault()
         event.stopPropagation()
         if(event.dataTransfer.files && event.dataTransfer.files.length > 0){
-            handleFile(event.dataTransfer.files[0])
+            if(event.dataTransfer.files[0].type.startsWith('image/')){
+                handleFile(event.dataTransfer.files[0])
+            }
         }
     }
     
@@ -76,12 +78,12 @@ const ImageComponent = ({entryId}: {entryId:string}) => {
 
   return (
     <div className='flex flex-col mt-20'>
-        <div id='myDiv' className={`relative hover:border-2 transition-all duration-100 ease-in mx-auto rounded-xl ${clickedElement ? "border-2 border-pink-500"  :""}`}>
+        <div id='myDiv' className={`relative hover:border-2 transition-all duration-100 ease-in mx-auto rounded-xl ${clickedElement ? "border-2 border-pink-500"  :""} ${entryData?.extra2 === 'large' ? "max-w-screen-lg" :"max-w-screen-md"}`}>
             <div                             
                 onDrop={handleDrop}
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragLeave}
-                onDragOver={handleDragOver} onClick={() => {setSelectedmenu('image');onOpenMenu();setSelectedEntryId(entryId);setClickedElement(true);handleClick()}} className={`flex items-center justify-center min-h-[400px] ${entryData?.extra2 === 'large' ? "max-w-screen-lg" :"max-w-screen-md"} aspect-video transition-all ease-in duration-200 ${!entryData?.content ? "bg-gray-100":"bg-white "} rounded-lg m-4`}>
+                onDragOver={handleDragOver} onClick={() => {setSelectedmenu('image');onOpenMenu();setSelectedEntryId(entryId);setClickedElement(true);handleClick()}} className={`flex items-center justify-center min-h-[400px] aspect-video transition-all ease-in duration-200 ${!entryData?.content ? "bg-gray-100":"bg-white "} rounded-lg m-4`}>
                 {entryData?.content ? (
                     <img src={entryData?.content} alt={entryData.extra1} className='rounded-xl max-w-full h-auto' />
                 ):(

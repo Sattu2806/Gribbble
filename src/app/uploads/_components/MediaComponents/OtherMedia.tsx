@@ -10,6 +10,7 @@ const OtherMedia = () => {
     const {selectedEntryId} = useMenuStore()
     const {updateEntry, getEntry}  =useUploadDataStore()
     const fileInputRef = useRef<HTMLInputElement | null> (null)
+    const entryData = getEntry(selectedEntryId)
     
     const handleFile = (file:File) => {
         const reader = new FileReader()
@@ -38,7 +39,15 @@ const OtherMedia = () => {
         event.preventDefault()
         event.stopPropagation()
         if(event.dataTransfer.files && event.dataTransfer.files.length > 0){
-            handleFile(event.dataTransfer.files[0])
+            if(entryData?.type === 'image'){
+                if(event.dataTransfer.files[0].type.startsWith('image/')){
+                    handleFile(event.dataTransfer.files[0])
+                }
+            } else if(entryData?.type === 'video'){
+                if(event.dataTransfer.files[0].type.startsWith('video/')){
+                    handleFile(event.dataTransfer.files[0])
+                }
+            }
         }
     }
     
@@ -55,7 +64,7 @@ const OtherMedia = () => {
         event.stopPropagation()
     }
 
-    const entryData = getEntry(selectedEntryId)
+    
 
     const removeData = () => {
         updateEntry(selectedEntryId,null)

@@ -16,6 +16,7 @@ import Link from "@tiptap/extension-link"
 import EditorComp from './TextComponent/EditorComp'
 import MainTextComp from './TextComponent/MainTextComp'
 import ImageComponent from './MediaComponents/ImageComponent'
+import VideoComponent from './MediaComponents/VideoComponent'
 
 
 type Props = {}
@@ -193,6 +194,10 @@ const UploadComponent = (props: Props) => {
                                     } else if(entry.type === 'image'){
                                         return(
                                             <ImageComponent key={entry.id} entryId={entry.id}/>
+                                        )
+                                    } else if(entry.type === 'video'){
+                                        return(
+                                            <VideoComponent key={entry.id} entryId={entry.id} />
                                         )
                                     }
                                     return null

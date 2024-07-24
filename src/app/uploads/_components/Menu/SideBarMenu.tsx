@@ -73,11 +73,16 @@ const SideBarMenu = (props: Props) => {
         addEntry(id,'image',null,'','',selectedEntryId)
     }
 
+    const addVideoComp = () => {
+        const id = uuidv4()
+        addEntry(id,'video',null,'','',selectedEntryId)
+    }
+
 
     const data = getEntry(selectedEntryId)
 
     const updateAltText = (e:React.ChangeEvent<HTMLInputElement>) => {
-        updateEntry(selectedEntryId,data?.content!,e.target.value)
+        updateEntry(selectedEntryId,data?.content!,e.target.value,data?.extra2)
     }
 
 
@@ -125,7 +130,7 @@ const SideBarMenu = (props: Props) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='mt-3 text-sm'>
+                            <div onClick={addVideoComp} className='mt-3 text-sm'>
                                 <div className='flex items-center justify-between hover:bg-neutral-100 rounded-lg py-2 px-1'>
                                     <div className='flex items-center justify-between space-x-3'>
                                         <span>
@@ -213,24 +218,14 @@ const SideBarMenu = (props: Props) => {
                         <div className='mt-5'>
                             <OtherMedia />
                             <div className='mt-7'>
-                                <label htmlFor="" className='font-medium'>Alt Text</label>
-                                <div className='mt-3'>
-                                    <input 
-                                        type="text"
-                                         className='outline-none bg-transparent focus:outline-none text-xl placeholder:text-[14px] break-words break-normal whitespace-pre focus:border-2 focus:border-pink-500 px-3 py-2 border-2 rounded-lg'
-                                         placeholder='Enter alt text'
-                                    />
-                                </div>
-                            </div>
-                            <div className='mt-7'>
                                 <label htmlFor="" className='font-medium'>layout</label>
                                 <div className='mt-3 grid grid-cols-2'>
-                                    <button className={`border-[2px] rounded-s-xl py-3 flex items-center justify-center `}>
+                                    <button onClick={MakeSmall} className={`border-[2px] rounded-s-xl py-3 flex items-center justify-center ${data?.extra2  === 'small' ? 'border-purple-500' : ''}`}>
                                         <span>
                                             <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor" xmlns="http://www.w3.org/2000/svg" svg-inline="" role="presentation" focusable="false" className="icon-12"><path fillRule="evenodd" clipRule="evenodd" d="M12.53.47a.75.75 0 010 1.06L9.534 4.527h1.856a.75.75 0 010 1.5h-3.64a.748.748 0 01-.777-.75V1.61a.75.75 0 011.5 0v1.857L11.47.47a.75.75 0 011.06 0zM1.61 6.972a.75.75 0 000 1.5h1.857L.47 11.47a.75.75 0 001.06 1.06l2.997-2.997v1.856a.75.75 0 001.5 0v-3.64a.748.748 0 00-.75-.777m-3.667 0h3.667z"></path></svg>
                                         </span>
                                     </button>
-                                    <button className={`border-[2px] rounded-e-xl py-3 flex items-center justify-center `}>
+                                    <button onClick={Makelarge} className={`border-[2px] rounded-e-xl py-3 flex items-center justify-center ${data?.extra2  === 'large' ? 'border-purple-500' : ''}`}>
                                         <span>
                                             <svg width="13" height="13" viewBox="0 0 13 13" fill="currentColor" xmlns="http://www.w3.org/2000/svg" svg-inline="" role="presentation" focusable="false" className="icon-12"><path fillRule="evenodd" clipRule="evenodd" d="M12.53.47a.75.75 0 010 1.06L9.534 4.527h1.856a.75.75 0 010 1.5h-3.64a.748.748 0 01-.777-.75V1.61a.75.75 0 011.5 0v1.857L11.47.47a.75.75 0 011.06 0zM1.61 6.972a.75.75 0 000 1.5h1.857L.47 11.47a.75.75 0 001.06 1.06l2.997-2.997v1.856a.75.75 0 001.5 0v-3.64a.748.748 0 00-.75-.777m-3.667 0h3.667z"></path></svg>
                                         </span>
