@@ -12,7 +12,11 @@ interface DataActions {
     entries:UploadData[]
     addEntry:(id:string,type:UploadData['type'],content?:string | null, extra1?:string,extra2?:string,afterId?:string) => void,
     getEntry:(id:string) => UploadData | undefined,
-    updateEntry:(id:string,content:string | null, extra1?:string,extra2?:string) => void
+    updateEntry:(id:string,content:string | null, extra1?:string,extra2?:string) => void,
+    moveEntryUp:(id:string) => void
+    moveEntryDown:(id:string) => void
+    copyEntry:(originalId:string,newId:string) => void
+    removeEntry:(id:string) => void
 }
 
 const useUploadDataStore = create<DataActions>((set,get) => ({
@@ -42,8 +46,49 @@ const useUploadDataStore = create<DataActions>((set,get) => ({
                 entry.id === id ? { ...entry, content, extra1, extra2 } : entry
             )
         }));
+    },
+    moveEntryUp:(id) => {
+        set(state => {
+            const index = state.entries.findIndex(entry => entry.id === id)
+            if(index > 0){
+                const newEntries = [...state.entries];
+                [newEntries[index],newEntries[index - 1]] = [newEntries[index - 1] , newEntries[index]]
+                return {entries: newEntries}
+            }
+            return state
+        })
+    },
+
+    moveEntryDown:(id) => {
+        set(state => {
+            const index = state.entries.findIndex(entry => entry.id === id)
+            if(index !== -1 && index < state.entries.length - 1){
+                const newEntries = [...state.entries];
+                [newEntries[index],newEntries[index + 1]] = [newEntries[index+1],newEntries[index]]
+                return {entries: newEntries}
+            }
+            return state
+        })
+    },
+
+    copyEntry:(originalId,newId) => {
+        set(state => {
+            const index = state.entries.findIndex(entry => entry.id === originalId)
+            if(index !== -1){
+                const entryToCopy = state.entries[index]
+                const newEntry = {...entryToCopy,id:newId}
+                const newEntries = [...state.entries]
+                newEntries.splice(index + 1 ,0,newEntry)
+                return {entries: newEntries}
+            }
+
+            return state
+        })
+    },
+
+    removeEntry:(id) => {
+        set(state => ({entries:state.entries.filter(entry => entry.id !== id)}))
     }
-    
 }))
 
 export default useUploadDataStore

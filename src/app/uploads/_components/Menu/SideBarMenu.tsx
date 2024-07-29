@@ -67,7 +67,7 @@ const SideBarMenu = (props: Props) => {
             content: Content
         })
         
-        addEntry(newEditor,'text')
+        addEntry(newEditor,'text',null,'','',selectedEntryId)
     }
 
     const addImageComp = () => {

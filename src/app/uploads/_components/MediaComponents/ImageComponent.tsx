@@ -3,13 +3,14 @@ import { useMenuStore } from '@/hooks/use-menu'
 import React, { useEffect, useRef, useState } from 'react'
 import useUploadDataStore from '@/hooks/use-upload-data'
 import {v4 as uuidv4} from "uuid"
+import { ArrowDown, ArrowUp, Copy, Trash2 } from 'lucide-react'
 
 type Props = {}
 
 const ImageComponent = ({entryId}: {entryId:string}) => {
     const [clickedElement, setClickedElement] = useState<boolean>(false)
-    const {setSelectedEntryId, setSelectedmenu,onOpenMenu} = useMenuStore()
-    const {getEntry,updateEntry} = useUploadDataStore()
+    const {setSelectedEntryId, setSelectedmenu,onOpenMenu,isMenuOpen,selectedEntryId} = useMenuStore()
+    const {getEntry,updateEntry,removeEntry,moveEntryDown,moveEntryUp,copyEntry} = useUploadDataStore()
     const fileInputRef = useRef<HTMLInputElement | null> (null)
 
     console.log("entry", entryId)
@@ -94,6 +95,20 @@ const ImageComponent = ({entryId}: {entryId:string}) => {
                         <input ref={fileInputRef} type="file" onChange={handleFileChange} accept='image/*' className='hidden' />
                     </label>
                 )}
+            </div>
+            <div className={`absolute top-0 -right-14 w-10 p-2 py-4 rounded-full flex flex-col items-center justify-center gap-3 bg-white shadow-xl ${isMenuOpen && selectedEntryId === entryId ? "" :"hidden"}`}>
+                <ArrowUp onClick={() => moveEntryUp(entryId)} size={16}/>
+                <ArrowDown onClick={() => moveEntryDown(entryId)} size={16}/>
+                <div className='inline-block bg-neutral-800 h-[0.1px] w-2/4'/>
+                <Copy
+                    onClick={() => {
+                        const newId = uuidv4()
+                        copyEntry(entryId,newId)
+                    }}
+                    size={16}
+                />
+                <div className='inline-block bg-neutral-800 h-[0.1px] w-2/4'/>
+                <Trash2 onClick={() => removeEntry(entryId)} className='text-red-500' size={16} />
             </div>
         </div>
         <div className='flex opacity-0 hover:opacity-100 transition-all duration-150 ease-in items-center mt-10'>

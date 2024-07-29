@@ -1,4 +1,5 @@
 import Container from "@/components/Container";
+import TagComponent from "./_components/TagComponent";
 
 
 export default function RootLayout({
@@ -9,6 +10,7 @@ export default function RootLayout({
   return (
     <section>
         <Container>
+          <TagComponent/>
             {children}
         </Container>
     </section>

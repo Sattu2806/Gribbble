@@ -1,6 +1,8 @@
 import { useMenuStore } from '@/hooks/use-menu'
 import useUploadDataStore from '@/hooks/use-upload-data'
 import React, { useEffect, useRef, useState } from 'react'
+import { ArrowDown, ArrowUp, Copy, Trash2,Plus } from 'lucide-react'
+import {v4 as uuidv4} from "uuid"
 
 type Props = {
     entryId:string
@@ -9,9 +11,9 @@ type Props = {
 }
 
 const Firstmedia = ({url,type,entryId}: Props) => {
+    const {getEntry,updateEntry,removeEntry,moveEntryDown,moveEntryUp,copyEntry} = useUploadDataStore()
     const [clickedElement, setClickedElement] = useState<boolean>(false)
-    const {setSelectedEntryId, setSelectedmenu,onOpenMenu} = useMenuStore()
-    const {getEntry,updateEntry} = useUploadDataStore()
+    const {setSelectedEntryId,setSelectedmenu,onOpenMenu,selectedEntryId,isMenuOpen} = useMenuStore()
     const fileInputRef = useRef<HTMLInputElement | null> (null)
     
 
@@ -82,7 +84,7 @@ const Firstmedia = ({url,type,entryId}: Props) => {
     const entryData = getEntry(entryId)
   return (
     <div  className='mt-10 mb-5 px-5 flex flex-col'>
-        <div id='myDiv' onClick={() => {setClickedElement(true);setSelectedmenu(type === 'image' ? 'image' : type === 'video' ? 'video' : 'main');setSelectedEntryId(entryId);onOpenMenu()}} className={`hover:border-[2px] transition-all duration-150 ease-in rounded-xl mx-auto ${clickedElement ? "border-2 border-pink-500"  :""} ${entryData?.extra2 === 'large' ? "max-w-screen-lg" :"max-w-screen-md"}`}>
+        <div id='myDiv' onClick={() => {setClickedElement(true);setSelectedmenu(type === 'image' ? 'image' : type === 'video' ? 'video' : 'main');setSelectedEntryId(entryId);onOpenMenu()}} className={`hover:border-[2px] transition-all duration-150 ease-in rounded-xl mx-auto ${clickedElement ? "border-2 border-pink-500"  :""} ${entryData?.extra2 === 'large' ? "max-w-screen-lg" :"max-w-screen-md"} relative`}>
             <div onDrop={handleDrop}
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragLeave}
@@ -102,6 +104,20 @@ const Firstmedia = ({url,type,entryId}: Props) => {
                     </label>
                 )}
             </div>
+            <div className={`absolute top-0 -right-14 w-10 p-2 py-4 rounded-full flex flex-col items-center justify-center gap-3 bg-white shadow-xl ${isMenuOpen && selectedEntryId === entryId ? "" :"hidden"}`}>
+                <ArrowUp onClick={() => moveEntryUp(entryId)} size={16}/>
+                <ArrowDown onClick={() => moveEntryDown(entryId)} size={16}/>
+                <div className='inline-block bg-neutral-800 h-[0.1px] w-2/4'/>
+                <Copy
+                    onClick={() => {
+                        const newId = uuidv4()
+                        copyEntry(entryId,newId)
+                    }}
+                    size={16}
+                />
+                <div className='inline-block bg-neutral-800 h-[0.1px] w-2/4'/>
+                <Trash2 onClick={() => removeEntry(entryId)} className='text-red-500' size={16} />
+        </div>
         </div>
         <div className='flex opacity-0 hover:opacity-100 transition-all duration-150 ease-in items-center mt-10'>
             <div className='line border-2 h-[1.5px] border-pink-500 w-full rounded-full'></div>

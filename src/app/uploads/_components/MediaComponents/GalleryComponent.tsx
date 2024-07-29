@@ -9,9 +9,10 @@ import {
     CarouselNext,
     CarouselPrevious,
   } from "@/components/ui/carousel"
-import { Plus, Trash2 } from 'lucide-react'
 import { useSelectedSlideStore } from '@/hooks/use-selected-slide'
 import { useCarousalApiStore } from '@/hooks/use-carousal-api'
+import { ArrowDown, ArrowUp, Copy, Trash2,Plus } from 'lucide-react'
+import {v4 as uuidv4} from "uuid"
 
 type Props = {
     entryId:string
@@ -26,9 +27,9 @@ export interface GalleryData {
 
 
 const GalleryCompnent = ({entryId}: Props) => {
-    const {getEntry,updateEntry} = useUploadDataStore()
+    const {getEntry,updateEntry,removeEntry,moveEntryDown,moveEntryUp,copyEntry} = useUploadDataStore()
     const [clickedElement, setClickedElement] = useState<boolean>(false)
-    const {setSelectedEntryId,setSelectedmenu,onOpenMenu} = useMenuStore()
+    const {setSelectedEntryId,setSelectedmenu,onOpenMenu,selectedEntryId,isMenuOpen} = useMenuStore()
     const fileInputRef = useRef<HTMLInputElement | null> (null)
     const EntryData = getEntry(entryId)
     // const [api, setApi] = React.useState<CarouselApi>()
@@ -167,6 +168,20 @@ const GalleryCompnent = ({entryId}: Props) => {
                     </div>
                 </label>
                 )}
+            </div>
+            <div className={`absolute top-0 -right-14 w-10 p-2 py-4 rounded-full flex flex-col items-center justify-center gap-3 bg-white shadow-xl ${isMenuOpen && selectedEntryId === entryId ? "" :"hidden"}`}>
+                <ArrowUp onClick={() => moveEntryUp(entryId)} size={16}/>
+                <ArrowDown onClick={() => moveEntryDown(entryId)} size={16}/>
+                <div className='inline-block bg-neutral-800 h-[0.1px] w-2/4'/>
+                <Copy
+                    onClick={() => {
+                        const newId = uuidv4()
+                        copyEntry(entryId,newId)
+                    }}
+                    size={16}
+                />
+                <div className='inline-block bg-neutral-800 h-[0.1px] w-2/4'/>
+                <Trash2 onClick={() => removeEntry(entryId)} className='text-red-500' size={16} />
             </div>
             <div className='h-[90px] w-full flex items-center justify-center overflow-x-auto'>
                 <div className='flex items-center space-x-3'>

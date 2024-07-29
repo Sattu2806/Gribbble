@@ -1,8 +1,12 @@
+import { useContinueStore } from '@/hooks/use-continue-store'
+import useUploadDataStore from '@/hooks/use-upload-data'
 import React from 'react'
 
 type Props = {}
 
 const UploadNav = (props: Props) => {
+    const {onOpenContinuos} = useContinueStore()
+    const {entries} = useUploadDataStore()
   return (
     <div className='flex-1 pt-6 sticky top-0 bg-white z-50'>
         <div className='flex items-center justify-between sticky top-5 z-10'>
@@ -16,7 +20,11 @@ const UploadNav = (props: Props) => {
                     </button>
                 </div>
                 <div className='pr-4'>
-                    <button className='px-3 py-2 bg-neutral-900 text-white border-[1px] rounded-full text-xs font-medium'>
+                    <button onClick={() => {
+                        if(entries.length > 0){
+                            onOpenContinuos()
+                        }
+                    }} className='px-3 py-2 bg-neutral-900 text-white border-[1px] rounded-full text-xs font-medium'>
                         Continue
                     </button>
                 </div>
