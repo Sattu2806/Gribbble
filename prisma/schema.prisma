@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+ 
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  password      String?
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  accounts      Account[]
+  uploads       Upload[]
+  @@map("users")
+}
+ 
+
+model Items {
+  id          String   @id @default(cuid())
+  type        String
+  content     String
+  extra1      String
+  extra2      String
+  UploadId    String
+  upload      Upload @relation(fields: [UploadId],references: [id],onDelete: Cascade)
+}
+
+model Upload {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String
+  tags        String[]
+  items       Items[]
+  allowfeedback Boolean? @default(true)
+  userId       String
+  user         User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  categoryId   String
+  category    category @relation(fields: [categoryId],references: [id])
+  @@unique([categoryId])
+}
+
+model category {
+  id          String   @id @default(cuid())
+  name        String
+  upload      Upload[]
+}

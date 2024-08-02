@@ -1,29 +1,78 @@
 'use client'
+import { makeUpload } from '@/actions/upload'
 import { useContinueStore } from '@/hooks/use-continue-store'
+import useEditorStore from '@/hooks/use-editor'
+import { useTitleStore } from '@/hooks/use-title'
 import useUploadDataStore from '@/hooks/use-upload-data'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { getAllCategories } from '@/actions/category'
 
 type Props = {}
 
-const options = [
-    { value: 'discover', label: 'Discover' },
-    { value: 'animation', label: 'Animations' },
-    { value: 'branding', label: 'Branding' },
-    { value: 'illustration', label: 'Illustration' },
-    { value: 'mobile', label: 'Mobile' },
-    { value: 'print', label: 'Print' },
-    { value: 'productdesign', label: 'Product Design' },
-    { value: 'typography', label: 'Typography' },
-    { value: 'webdesign', label: 'Web Design' },
-];
 
 const TagComponent = (props: Props) => {
-    const {isContinuosOpen,selectedOption,setSelectedOption,textareaValue,setTextareaValue,extractTags,onCloseContinuos} = useContinueStore()
-    
+    const {isContinuosOpen,selectedOption,setSelectedOption,textareaValue,setTextareaValue,extractTags,onCloseContinuos,tagsArray} = useContinueStore()
+    const {entries,updateEntry,getEntry} = useUploadDataStore()
+    const {getEditor} = useEditorStore()
+    const {title} = useTitleStore()
+    const router =useRouter()
+    const [categories, setCategories] = useState<{value:string, label:string}[]>([])
 
-    const SaveShot = () => {
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await getAllCategories()
+                if(response){
+                    setCategories(response)
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        }
 
+        fetchCategories()
+    },[])
+
+    const SaveShot = async () => {
+        const updatedEntries = entries.map((entry) => {
+            if(entry.type === 'text'){
+                const editor = getEditor(entry.id)
+                const entryData = getEntry(entry.id)
+                if(editor){
+                    return{
+                        ...entry,
+                        content: editor.getHTML(),
+                    }
+                }
+            }
+
+            return entry
+        }) 
+
+        const selectedOptionValue = selectedOption ? selectedOption.value :''
+
+        const dataToSend = {
+            title,
+            entries:updatedEntries,
+            categoryId:selectedOptionValue,
+            tagsArray
+        }
+
+        try {
+            const response = await makeUpload(dataToSend)
+            // if(response?.sucess ){
+            //     router.push('/')
+            // } else {
+            //     toast('Error creating the shot')
+            // }
+            router.push('/')
+        } catch (error) {
+            toast('Error creating the shot')
+            console.error(error)
+        }
     }
   return (
     <div className={`fixed top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full z-50 ${isContinuosOpen ? "scale-100 opacity-100 translate-y-0":"scale-0 opacity-0 -translate-y-96"}`}>
@@ -31,7 +80,7 @@ const TagComponent = (props: Props) => {
             <div>
                 <h1 className='font-medium pb-2 pl-1 text-sm'>Select Category</h1>
                 <Select 
-                options={options}
+                options={categories}
                 placeholder='category'
                 value={selectedOption}
                 onChange={(option) => setSelectedOption(option)}

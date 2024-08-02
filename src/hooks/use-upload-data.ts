@@ -1,6 +1,6 @@
 import {create}from "zustand"
 
-interface UploadData {
+export interface UploadDataType {
     id:string
     type:'text' | 'image' | 'video' | 'gallery',
     content:string | null,
@@ -9,9 +9,9 @@ interface UploadData {
 }
 
 interface DataActions {
-    entries:UploadData[]
-    addEntry:(id:string,type:UploadData['type'],content?:string | null, extra1?:string,extra2?:string,afterId?:string) => void,
-    getEntry:(id:string) => UploadData | undefined,
+    entries:UploadDataType[]
+    addEntry:(id:string,type:UploadDataType['type'],content?:string | null, extra1?:string,extra2?:string,afterId?:string) => void,
+    getEntry:(id:string) => UploadDataType | undefined,
     updateEntry:(id:string,content:string | null, extra1?:string,extra2?:string) => void,
     moveEntryUp:(id:string) => void
     moveEntryDown:(id:string) => void
@@ -22,7 +22,7 @@ interface DataActions {
 const useUploadDataStore = create<DataActions>((set,get) => ({
     entries:[],
     addEntry:(id,type,content = null,extra1='',extra2 = 'small',afterId) => {
-        const newEntry : UploadData = {id,type,content,extra1,extra2}
+        const newEntry : UploadDataType = {id,type,content,extra1,extra2}
         set(state => {
             const entries = [...state.entries]
             const index = entries.findIndex(entry => entry.id === afterId)

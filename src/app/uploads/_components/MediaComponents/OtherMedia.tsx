@@ -1,3 +1,4 @@
+import { UploadMedia } from '@/actions/cloudinary'
 import { useMenuStore } from '@/hooks/use-menu'
 import useUploadDataStore from '@/hooks/use-upload-data'
 import React, { useRef } from 'react'
@@ -14,9 +15,17 @@ const OtherMedia = () => {
     
     const handleFile = (file:File) => {
         const reader = new FileReader()
+        const formData = new FormData()
+        formData.append('file', file)
         reader.onload = async () => {
             if(reader.result){
                 updateEntry(selectedEntryId,reader.result as string,'','small')
+                try {
+                    const {url} = await UploadMedia(formData)
+                    updateEntry(selectedEntryId,url,entryData?.extra1,entryData?.extra2)
+                } catch (error) {
+                    console.log("Error uploading file", error)
+                }
             }
         }
         reader.readAsDataURL(file)

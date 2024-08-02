@@ -4,6 +4,7 @@ import useUploadDataStore from '@/hooks/use-upload-data'
 import { ChevronLeft } from 'lucide-react'
 import React, { useRef } from 'react'
 import { GalleryData } from '../MediaComponents/GalleryComponent'
+import { UploadMedia } from '@/actions/cloudinary'
 
 type Props = {}
 
@@ -22,15 +23,23 @@ const SecondaryGalleryMenu = (props: Props) => {
             i === index ? {...file, url:newUrl} : file
         )
 
-        updateEntry(selectedEntryId,JSON.stringify(files))
+        updateEntry(selectedEntryId,JSON.stringify(files),entryData?.extra1,entryData?.extra2)
     }
     
     const handleFile = (file:File) => {
         const reader = new FileReader()
+        const formData = new FormData()
+        formData.append('file', file)
         reader.onload = async () => {
             if(reader.result){
-                const url = URL.createObjectURL(file)
-                ChangeMedia(selectedSlideIndex,url)
+                const Localurl = URL.createObjectURL(file)
+                ChangeMedia(selectedSlideIndex,Localurl)
+                try {
+                    const {url} = await UploadMedia(formData)
+                    ChangeMedia(selectedSlideIndex,url)
+                } catch (error) {
+                    console.log("Error uploading file", error)
+                }
             }
         }
         reader.readAsDataURL(file)

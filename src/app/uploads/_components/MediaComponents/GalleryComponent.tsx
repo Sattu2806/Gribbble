@@ -13,6 +13,7 @@ import { useSelectedSlideStore } from '@/hooks/use-selected-slide'
 import { useCarousalApiStore } from '@/hooks/use-carousal-api'
 import { ArrowDown, ArrowUp, Copy, Trash2,Plus } from 'lucide-react'
 import {v4 as uuidv4} from "uuid"
+import { UploadMedia } from '@/actions/cloudinary'
 
 type Props = {
     entryId:string
@@ -39,20 +40,83 @@ const GalleryCompnent = ({entryId}: Props) => {
     const {setSelectedSlideIndex, selectedSlideIndex} = useSelectedSlideStore()
     const GalleryObjects : GalleryData[] = EntryData?.content ? JSON.parse(EntryData.content) : [] 
 
-    const handleFile = (files:FileList) => {
-        if(files){
-            for (const file of Array.from(files)){
-                const LocalUrl = URL.createObjectURL(file)
-                GalleryObjects.push({url:LocalUrl, type:file.type.startsWith('image/') ? "image" : "video", alt:file.name})
+    
+    // const handleFile = async (files:FileList) => {
+    //     if(files){
+    //         const newFileObject: GalleryData[] = []
+    //         for (const file of Array.from(files)){
+    //             const LocalUrl = URL.createObjectURL(file)
+    //             newFileObject.push({url:LocalUrl, type:file.type.startsWith('image/') ? "image" : "video", alt:file.name})
+    //         }
+            
+    //         updateEntry(entryId,JSON.stringify([...GalleryObjects,...newFileObject]),EntryData?.extra1,EntryData?.extra2)
+
+    //         for(let i = 0 ; i < GalleryObjects.length ; i++){
+    //             const file = files[i]
+    //             const formData = new FormData()
+    //             formData.append("file",file)
+    //             try {
+    //                 const {url} = await UploadMedia(formData)
+    //                 newFileObject[i].url = url
+
+    //                 const updatedNewFileObject = [...GalleryObjects,...newFileObject]
+    //                 console.log("updatedNewFileObject",updatedNewFileObject)
+
+    //                 updateEntry(entryId,JSON.stringify(updatedNewFileObject),EntryData?.extra1,EntryData?.extra2)
+    //             } catch (error) {
+    //                 console.log("Error uploading file", error)
+    //             }
+    //         }
+    //     }
+
+    //     if(fileInputRef.current){
+    //         fileInputRef.current.value = ''
+    //     }
+
+    // }
+
+
+const handleFile = async (files: FileList) => {
+    if (files) {
+        const newFileObject: GalleryData[] = [];
+        const fileArray = Array.from(files);
+
+        fileArray.forEach(file => {
+            const localUrl = URL.createObjectURL(file);
+            newFileObject.push({
+                url: localUrl,
+                type: file.type.startsWith('image/') ? "image" : "video",
+                alt: file.name
+            });
+        });
+
+        const updatedGallery = [...GalleryObjects, ...newFileObject];
+        updateEntry(entryId, JSON.stringify(updatedGallery), EntryData?.extra1, EntryData?.extra2);
+
+        // Upload files
+        for (let i = 0; i < fileArray.length; i++) {
+            const file = fileArray[i];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const { url } = await UploadMedia(formData);
+                newFileObject[i].url = url;
+
+                const updatedNewFileObject = [...GalleryObjects, ...newFileObject];
+                console.log("updatedNewFileObject", updatedNewFileObject);
+
+                updateEntry(entryId, JSON.stringify(updatedNewFileObject), EntryData?.extra1, EntryData?.extra2);
+            } catch (error) {
+                console.log("Error uploading file", error);
             }
-            updateEntry(entryId,JSON.stringify(GalleryObjects))
         }
-
-        if(fileInputRef.current){
-            fileInputRef.current.value = ''
-        }
-
     }
+
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+};
 
     useEffect(() => {
         if(api){

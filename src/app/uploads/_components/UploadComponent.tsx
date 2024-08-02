@@ -8,7 +8,6 @@ import SideBarMenu from './Menu/SideBarMenu'
 import useUploadDataStore from '@/hooks/use-upload-data'
 import {v4 as uuidv4} from "uuid"
 import useEditorStore from '@/hooks/use-editor'
-import {Editor, EditorContent, useEditor} from "@tiptap/react"
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from "@tiptap/extension-text-align"
@@ -18,6 +17,8 @@ import MainTextComp from './TextComponent/MainTextComp'
 import ImageComponent from './MediaComponents/ImageComponent'
 import VideoComponent from './MediaComponents/VideoComponent'
 import GalleryCompnent from './MediaComponents/GalleryComponent'
+import { UploadMedia } from '@/actions/cloudinary'
+import { useTitleStore } from '@/hooks/use-title'
 
 
 type Props = {}
@@ -32,9 +33,9 @@ const UploadComponent = (props: Props) => {
     const fileInputRef = useRef<HTMLInputElement | null> (null)
     const [LocalUrl, setLocalUrl] = useState<string>()
     const [fileType, setFileType] = useState<"image" | "video">("image")
-    const [title, setTitle] = useState<string>()
+    const {setTitle,title} = useTitleStore()
     const {isMenuOpen} = useMenuStore()
-    const {entries, addEntry} = useUploadDataStore()
+    const {entries, addEntry,updateEntry,getEntry} = useUploadDataStore()
     const {createEditor} = useEditorStore()
     
 
@@ -47,17 +48,35 @@ const UploadComponent = (props: Props) => {
     const handleFile = (file:File) => {
         const reader = new FileReader()
         const id = uuidv4()
+        const formData = new FormData()
+        formData.append('file', file)
         reader.onload = async () => {
             if(reader.result){
                 if(file.type.startsWith('image/')){
                     setFileType('image')
                     addEntry(id,'image',reader.result as string,'','large')
+                    addEditor()
+
+                    try {
+                        const {url} = await UploadMedia(formData)
+                        const entryData = getEntry(id)
+                        updateEntry(id,url,entryData?.extra1,entryData?.extra2)
+                    } catch (error) {
+                        console.log("Error uploading file", error)
+                    }
                 }else if(file.type.startsWith('video/')){
                     setFileType('video')
                     addEntry(id,'video',reader.result as string,'','large')
+                    addEditor()
+                    try {
+                        const {url} = await UploadMedia(formData)
+                        const entryData = getEntry(id)
+                        updateEntry(id,url,entryData?.extra1,entryData?.extra2)
+                    } catch (error) {
+                        console.log("Error uploading file", error)
+                    }
                 }
                 setLocalUrl(reader.result as string)
-                addEditor()
             }
         }
         reader.readAsDataURL(file)

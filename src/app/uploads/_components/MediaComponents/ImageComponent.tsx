@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import useUploadDataStore from '@/hooks/use-upload-data'
 import {v4 as uuidv4} from "uuid"
 import { ArrowDown, ArrowUp, Copy, Trash2 } from 'lucide-react'
+import { UploadMedia } from '@/actions/cloudinary'
 
 type Props = {}
 
@@ -16,9 +17,17 @@ const ImageComponent = ({entryId}: {entryId:string}) => {
     console.log("entry", entryId)
     const handleFile = (file:File) => {
         const reader = new FileReader()
+        const formData = new FormData()
+        formData.append('file', file)
         reader.onload = async () => {
             if(reader.result){
                 updateEntry(entryId,reader.result as string,'','small')
+                try {
+                    const {url} = await UploadMedia(formData)
+                    updateEntry(selectedEntryId,url,entryData?.extra1,entryData?.extra2)
+                } catch (error) {
+                    console.log("Error uploading file", error)
+                }
             }
         }
         reader.readAsDataURL(file)
