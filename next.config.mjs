@@ -4,6 +4,8 @@ const nextConfig = {
         remotePatterns:[{
             hostname:'avatars.githubusercontent.com',
             protocol:'https',
+        },{
+            hostname:'res.cloudinary.com',
         }]
     }
 };

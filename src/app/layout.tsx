@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
 import { SessionProvider } from "next-auth/react";
+import ClientQueryProvider from "@/components/ClientQueryProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ClientQueryProvider>
     <SessionProvider>
     <html lang="en">
       <body className={inter.className}>
@@ -25,5 +27,6 @@ export default function RootLayout({
       </body>
     </html>
     </SessionProvider>
+    </ClientQueryProvider>
   );
 }

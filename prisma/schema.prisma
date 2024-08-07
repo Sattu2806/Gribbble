@@ -70,7 +70,6 @@ model Upload {
   user         User @relation(fields: [userId],references: [id],onDelete: Cascade)
   categoryId   String
   category    category @relation(fields: [categoryId],references: [id])
-  @@unique([categoryId])
 }
 
 model category {

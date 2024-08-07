@@ -68,7 +68,7 @@ const TagComponent = (props: Props) => {
             // } else {
             //     toast('Error creating the shot')
             // }
-            router.push('/')
+            // router.push('/')
         } catch (error) {
             toast('Error creating the shot')
             console.error(error)
