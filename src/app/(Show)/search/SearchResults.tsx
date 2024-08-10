@@ -1,43 +1,21 @@
 'use client'
-import { Items, Upload } from '@prisma/client'
 import React, { useEffect } from 'react'
+import { ShotDataType, FetchUploadDataResponse } from '../_components/RenderShots'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { getUploadDataByInifiteQuery } from '@/actions/upload'
-import { Button } from '@/components/ui/button'
-import EachShot from './EachShot'
+import { getUploadDataByInifiteQuery, getUploadDataByInifiteQuerySearch } from '@/actions/upload'
+import ShotSkeleton from '../_components/ShotSkeleton'
 import { useInView } from "react-intersection-observer";
+import EachShot from '../_components/EachShot'
 import Image from 'next/image'
-import ShotSkeleton from './ShotSkeleton'
 
 type Props = {}
 
-export interface ShotDataType extends Upload {
-    items:Items[]
-}
-
-interface MetaData {
-    lastCursor:string | null
-    hasNextpage:boolean
-}
-
-interface UploadData {
-    data: ShotDataType[]
-    metaData:MetaData
-}
-
-type FetchUploadDataResponse  = {
-    success:boolean
-    data:ShotDataType[]
-    metaData:MetaData
-    error?:string
-}
-
-const RenderShots = (props: Props) => {
+const SearchResults = ({params}:{params:{searchString:string}}) => {
     const { ref, inView } = useInView();
 
     const fetchUploadData = async (take:string, lastCursor:string) => {
         try {
-            const response = await getUploadDataByInifiteQuery(take,lastCursor)
+            const response = await getUploadDataByInifiteQuerySearch(take,lastCursor,decodeURIComponent(params.searchString))
             if(response && 'data' in response){
                 const {data} = response
                 return data
@@ -59,7 +37,7 @@ const RenderShots = (props: Props) => {
         status,
         isLoading
     } = useInfiniteQuery<FetchUploadDataResponse>({
-        queryKey: ['upload-shot-data'],
+        queryKey: ['upload-shot-data',params.searchString],
         queryFn:({pageParam = ""}) => fetchUploadData("10",`${pageParam}`),
         initialPageParam: undefined,
         getNextPageParam: (lastPage) => {
@@ -78,8 +56,6 @@ const RenderShots = (props: Props) => {
             <ShotSkeleton/>
         )
     }
-    console.log("sdcds",UploadData)
-
   return (
     <div className='pt-10'>
         <div className='grid gap-10 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1'>
@@ -109,4 +85,4 @@ const RenderShots = (props: Props) => {
   )
 }
 
-export default RenderShots
+export default SearchResults

@@ -1,16 +1,30 @@
 'use client'
 import { ChevronDown, Search } from 'lucide-react'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useState,KeyboardEvent } from 'react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import UserProfilePopUp from './userProfilePopUp'
+import { useRouter } from 'next/navigation'
 
-type Props = {}
+type Props = {
+    searchString?:string
+}
 
-const Navbar = (props: Props) => {
+const Navbar = ({searchString}: Props) => {
     const {status,data} = useSession()
     const [openProfileModal, setopenProfileModal] = useState<boolean>(false)
+    const router = useRouter()
+    const [searchQuery, setSearchQuery] = useState<string>(decodeURIComponent(searchString ? searchString : ''))
+
+    const handleSearch = (event:KeyboardEvent<HTMLInputElement>) => {
+        if(event.key === 'Enter'){
+            event.preventDefault()
+            if(searchQuery.trim()){
+                router.push(`/search/${encodeURIComponent(searchQuery.trim())}`)
+            }
+        }
+    }
   return (
     <div className='max-w-[1400px] px-10 text-sm flex items-center justify-between py-4'>
             <div className='flex items-center space-x-5 font-medium max-md:hidden'>
@@ -39,6 +53,9 @@ const Navbar = (props: Props) => {
                     <Search size={16} className='text-neutral-600'/>
                     <input 
                     type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearch}
                     className='focus:outline-none bg-transparent'
                     placeholder='Search..'
                      />
