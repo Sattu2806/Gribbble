@@ -25,7 +25,7 @@ interface UploadData {
     metaData:MetaData
 }
 
-type FetchUploadDataResponse  = {
+export type FetchUploadDataResponse  = {
     success:boolean
     data:ShotDataType[]
     metaData:MetaData
