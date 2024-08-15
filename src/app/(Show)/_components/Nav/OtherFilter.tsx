@@ -1,10 +1,26 @@
 import { Search } from 'lucide-react'
-import React from 'react'
+import React, { useState, KeyboardEvent } from 'react'
 import {motion} from "framer-motion"
+import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 type Props = {}
 
 const OtherFilter = (props: Props) => {
+    const [querytag, setQueryTag] = useState<string>('')
+    const router = useRouter()
+    const pathname = usePathname()
+
+    const handleSearch = (event:KeyboardEvent<HTMLInputElement>) => {
+        if(event.key === 'Enter'){
+            event.preventDefault()
+            if(querytag.trim()){
+                router.push(`${pathname}/?tags=${querytag}`)
+            } else {
+                router.push(`${pathname}`)
+            }
+        }
+    }
   return (
     <div className='mt-5'>
         <form action="" className='flex items-center justify-between md:space-x-7 max-md:grid max-md:grid-cols-1 max-md:w-11/12 mx-auto max-md:gap-5'>
@@ -16,6 +32,9 @@ const OtherFilter = (props: Props) => {
                         <Search className='text-neutral-500 font-bold' size={20}/>
                         <input 
                         type="search"
+                        value={querytag}
+                        onKeyDown={handleSearch}
+                        onChange={(e) => setQueryTag(e.target.value)}
                         className='focus:outline-none pl-3 bg-transparent placeholder:text-sm text-sm w-full placeholder:text-neutral-400'
                         placeholder='Search'
                         autoComplete='off'

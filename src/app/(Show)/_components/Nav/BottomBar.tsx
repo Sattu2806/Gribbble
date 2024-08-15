@@ -2,6 +2,11 @@
 import React, { useState } from 'react'
 import {motion} from "framer-motion"
 import OtherFilter from './OtherFilter'
+import { useQuery } from '@tanstack/react-query'
+import { getAllCategories } from '@/actions/category'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
 type Props = {}
 
@@ -10,11 +15,20 @@ const BottomBar = (props: Props) => {
     const [showFilter, setshowFilter] = useState<boolean>(false)
     const [otherFilter, setotherFilter] = useState<boolean>(false)
     const [activeItem, setActiveItem] = useState<string>('Following')
+    const searchParams = useSearchParams()
+    const categoryId = searchParams.get('category')
 
     const handleFilter = () => {
         setIsRoated(!isRotated)
         setshowFilter(!showFilter)
     }
+
+    const {data: categories, isLoading, error} = useQuery({queryKey:['cat-bot'], queryFn: async() => {
+        const categories = await getAllCategories()
+        return categories
+    },staleTime: 1000 * 60 * 30})
+
+    const skeletonArray = Array.from({length:10})
   return (
     <div className='mx-auto pt-7 lg:px-9 md:px-5 sm:px-6 px-6'>
         <div className='flex items-center justify-between relative'>
@@ -51,33 +65,17 @@ const BottomBar = (props: Props) => {
             </div>
             <div className='filter-categories overflow-x-auto'>
                 <ul className='flex flex-row items-center text-neutral-800 justify-between font-medium whitespace-nowrap scroll-m-0 space-x-4 text-xs max-md:hidden'>
-                <li className='bg-neutral-200 p-2 rounded-lg'>
-                    <a href="" className=''>Discover</a>
-                </li>
-                <li className='p-2 rounded-lg'>
-                    <a href="">Animation</a>
-                </li>
-                <li className='p-2 rounded-lg'>
-                    <a href="">Branding</a>
-                </li>
-                <li className='p-2 rounded-lg'>
-                    <a href="">Illustration</a>
-                </li>
-                <li className='p-2 rounded-lg'>
-                    <a href="">Mobile</a>
-                </li>
-                <li className='p-2 rounded-lg'>
-                    <a href="">Print</a>
-                </li>
-                <li className='p-2 rounded-lg'>
-                    <a href="">Product Design</a>
-                </li>
-                <li className='p-2 rounded-lg'>
-                    <a href="">Typography</a>
-                </li>
-                <li className='p-2 rounded-lg'>
-                    <a href="">Web Design</a>
-                </li>
+                    {isLoading ? (
+                        skeletonArray.map((skel,index) => (
+                            <Skeleton key={index} className='w-[70px] h-[20px]'/>
+                        ))
+                    ):(
+                        categories?.map((category,index) => (
+                            <li className={` ${categoryId === category.value ? "bg-neutral-100":""} p-2 hover:text-neutral-800 rounded-full`}>
+                                <Link href={`?category=${category.value}`}>{category.label}</Link>
+                            </li>
+                        ))
+                    )}
                 </ul>
             </div>
             <div className='ml-20 max-sm:ml-10'>
@@ -91,33 +89,17 @@ const BottomBar = (props: Props) => {
         </div>
         <div className='filter-categories overflow-x-auto mt-3 md:hidden'>
                     <ul className='flex flex-row items-center text-neutral-800 justify-between font-medium whitespace-nowrap scroll-m-0 space-x-4 text-xs'>
-                    <li className='bg-neutral-200 p-2 rounded-lg'>
-                        <a href="" className=''>Discover</a>
-                    </li>
-                    <li className='p-2 rounded-lg'>
-                        <a href="">Animation</a>
-                    </li>
-                    <li className='p-2 rounded-lg'>
-                        <a href="">Branding</a>
-                    </li>
-                    <li className='p-2 rounded-lg'>
-                        <a href="">Illustration</a>
-                    </li>
-                    <li className='p-2 rounded-lg'>
-                        <a href="">Mobile</a>
-                    </li>
-                    <li className='p-2 rounded-lg'>
-                        <a href="">Print</a>
-                    </li>
-                    <li className='p-2 rounded-lg'>
-                        <a href="">Product Design</a>
-                    </li>
-                    <li className='p-2 rounded-lg'>
-                        <a href="">Typography</a>
-                    </li>
-                    <li className='p-2 rounded-lg'>
-                        <a href="">Web Design</a>
-                    </li>
+                    {isLoading ? (
+                        skeletonArray.map((skel,index) => (
+                            <Skeleton key={index} className='w-[70px] h-[20px]'/>
+                        ))
+                    ):(
+                        categories?.map((category,index) => (
+                            <li className={` ${categoryId === category.value ? "bg-neutral-100":""} p-2 hover:text-neutral-800 rounded-full`}>
+                                <Link href={`?category=${category.value}`}>{category.label}</Link>
+                            </li>
+                        ))
+                    )}
                     </ul>
         </div>
         <div className={`${otherFilter ? "blcok":"hidden"}`}>

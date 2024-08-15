@@ -51,9 +51,13 @@ export const makeUpload = async (values:ShotType) => {
 }
 
 
-export const getUploadDataByInifiteQuery = async (take:string,lastCursor:string) => {
+export const getUploadDataByInifiteQuery = async (take:string,lastCursor:string,categoryId:string | null,queryTag:string | null) => {
     try {
         const shots = await prisma.upload.findMany({
+            where:{
+                ...(categoryId && {categoryId: categoryId}),
+                ...(queryTag && {tags : {has:queryTag}})
+            },
             include:{
                 items:true
             },

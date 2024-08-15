@@ -8,6 +8,7 @@ import EachShot from './EachShot'
 import { useInView } from "react-intersection-observer";
 import Image from 'next/image'
 import ShotSkeleton from './ShotSkeleton'
+import { useSearchParams } from 'next/navigation'
 
 type Props = {}
 
@@ -34,10 +35,13 @@ export type FetchUploadDataResponse  = {
 
 const RenderShots = (props: Props) => {
     const { ref, inView } = useInView();
+    const searchParams = useSearchParams()
+    const categoryId = searchParams.get('category')
+    const queryTag = searchParams.get('tags')
 
     const fetchUploadData = async (take:string, lastCursor:string) => {
         try {
-            const response = await getUploadDataByInifiteQuery(take,lastCursor)
+            const response = await getUploadDataByInifiteQuery(take,lastCursor,categoryId,queryTag)
             if(response && 'data' in response){
                 const {data} = response
                 return data
@@ -59,7 +63,7 @@ const RenderShots = (props: Props) => {
         status,
         isLoading
     } = useInfiniteQuery<FetchUploadDataResponse>({
-        queryKey: ['upload-shot-data'],
+        queryKey: ['upload-shot-data',categoryId,queryTag],
         queryFn:({pageParam = ""}) => fetchUploadData("10",`${pageParam}`),
         initialPageParam: undefined,
         getNextPageParam: (lastPage) => {
@@ -84,7 +88,7 @@ const RenderShots = (props: Props) => {
     <div className='pt-10'>
         <div className='grid gap-10 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1'>
             {UploadData?.pages.map((page,index) => (
-                page.data.map((shot,shotindex) => {
+                page?.data?.map((shot,shotindex) => {
                     const isLastShot = page.data.length === shotindex + 1
                     return(
                         <div 
@@ -104,7 +108,6 @@ const RenderShots = (props: Props) => {
                 )}
             </div>
         </div>
-        {/* <Button onClick={() => fetchNextPage()}>sdvs d</Button> */}
     </div>
   )
 }
