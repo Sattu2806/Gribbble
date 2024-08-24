@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
 import { SessionProvider } from "next-auth/react";
 import ClientQueryProvider from "@/components/ClientQueryProvider";
+import MainView from "./(Show)/_components/main-view/MainView";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Toaster />
+        <MainView/>
         {children}
       </body>
     </html>

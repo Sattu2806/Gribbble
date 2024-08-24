@@ -59,7 +59,13 @@ export const getUploadDataByInifiteQuery = async (take:string,lastCursor:string,
                 ...(queryTag && {tags : {has:queryTag}})
             },
             include:{
-                items:true
+                items:true,
+                user:{
+                    select:{
+                        image:true,
+                        name:true
+                    }
+                }
             },
             take:take ? parseInt(take as string) : 10,
             ...(lastCursor && {
@@ -69,7 +75,7 @@ export const getUploadDataByInifiteQuery = async (take:string,lastCursor:string,
                 }
             }),
             orderBy:{
-                createdAt:'asc'
+                createdAt:'desc'
             }
         })
 

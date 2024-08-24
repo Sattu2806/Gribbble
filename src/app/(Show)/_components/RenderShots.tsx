@@ -13,7 +13,11 @@ import { useSearchParams } from 'next/navigation'
 type Props = {}
 
 export interface ShotDataType extends Upload {
-    items:Items[]
+    items:Items[],
+    user:{
+        image:string,
+        name:string,
+    }
 }
 
 interface MetaData {
