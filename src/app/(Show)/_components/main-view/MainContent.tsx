@@ -23,7 +23,6 @@ type Props = {
 
 const MainContent = ({shotData}: Props) => {
 
-    console.log("shotData",shotData)
   return (
     <div className='mt-5'>
         {shotData?.items.map((item,index) => {
@@ -60,6 +59,10 @@ const MainContent = ({shotData}: Props) => {
                     <CarouselPrevious className='left-5' />
                     <CarouselNext className='right-5' />
                 </Carousel>
+                )
+            } else {
+                return(
+                    <div key={item.id}></div>
                 )
             }
         })}

@@ -8,6 +8,10 @@ import { getShotById } from '@/actions/shot'
 import MainViewSkeleton from './MainViewSkeleton'
 import Heading from './Heading'
 import MainContent from './MainContent'
+import Image from 'next/image'
+import { getMoreShotByUser } from '@/actions/upload'
+import Link from 'next/link'
+import EachShot from '../EachShot'
 
 type Props = {}
 
@@ -24,6 +28,20 @@ const MainView = (props: Props) => {
             }
         }
     })
+
+    const {isLoading:MoreShotLoading,data:MoreShotData} = useQuery({
+        queryKey: ['more-shot',ShotData],
+        queryFn:async() => {
+            if(selectedShotId && ShotData?.user.id){
+                const shot = await getMoreShotByUser(ShotData?.user.id)
+                if(shot)
+                    return shot
+            }
+        }
+    })
+
+
+
   return (
     <AnimatePresence>
         {isShotOpen && (
@@ -47,6 +65,41 @@ const MainView = (props: Props) => {
                                     <h1 className='text-2xl font-semibold'>{ShotData?.title}</h1>
                                     <Heading shotData={ShotData} />
                                     <MainContent shotData={ShotData}/>
+                                    <div>
+                                        <div className='flex items-center mt-14 mb-8'>
+                                            <div className='w-full h-[2px] bg-neutral-200' />
+                                            <span className='mx-5'>
+                                                {ShotData?.user.image ? (
+                                                    <div className='w-16 h-16'>
+                                                        <Image src={ShotData?.user.image} alt={ShotData?.user.image} width={64} height={64} className=' rounded-full' />
+                                                    </div>
+                                                ):(
+                                                    <div className='w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center'>
+                                                        <p className='uppercase text-4xl font-medium text-white'>{ShotData?.user.name?.charAt(0)}</p>
+                                                    </div>
+                                                )}
+                                            </span>
+                                            <div className='w-full h-[2px] bg-neutral-200' />
+                                        </div>
+                                        <div className='flex flex-col items-center'>
+                                                <h1 className='text-2xl font-medium text-black'>{ShotData?.user.name}</h1>
+                                                <p className='text-sm py-3 mb-4'>Creating stars in the digital universe ✨ ⤵</p>
+                                                <button className='px-5 py-[10px] rounded-full bg-neutral-950 font-medium text-white text-sm'>Get in Touch</button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className='flex items-center justify-between mt-20 mb-3'>
+                                                <h1 className='font-bold'>More by {ShotData?.user.name}</h1>
+                                                <Link href='/profile'>View profile</Link>
+                                        </div>
+                                        <div className='grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-5'>
+                                            {MoreShotData && MoreShotData.map((data,index) => (
+                                                <div key={index}>
+                                                    <EachShot shot={data} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -44,6 +44,8 @@ model User {
   image         String?
   accounts      Account[]
   uploads       Upload[]
+  followers     Following[] @relation("Followers")
+  follwings     Following[] @relation("Following")
   @@map("users")
 }
  
@@ -76,4 +78,15 @@ model category {
   id          String   @id @default(cuid())
   name        String
   upload      Upload[]
+}
+
+model Following {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+
+  follower    User @relation("Followers", fields: [followerId],references: [id])
+  following   User @relation("Following", fields: [followingId],references: [id])
+
+  @@unique([followerId,followingId])
 }

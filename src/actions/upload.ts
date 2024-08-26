@@ -197,3 +197,34 @@ export const getUploadDataByInifiteQuerySearch = async (take:string,lastCursor:s
         },error:"Error fetching the data"}
     }
 }
+
+
+export const getMoreShotByUser = async (id:string) => {
+    try {
+        const shots = await prisma.upload.findMany({
+            where:{
+                userId:id,
+                id:{
+                    not:id
+                }
+            },
+            include:{
+                items:true,
+                user:{
+                    select:{
+                        name:true,
+                        image:true
+                    }
+                }
+            },
+            take:4,
+            orderBy:{
+                createdAt:"desc"
+            }
+        })
+        return shots
+    } catch (error) {
+        console.log("Error fetching more shots")
+        return null
+    }
+}

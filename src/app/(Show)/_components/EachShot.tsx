@@ -42,7 +42,6 @@ const EachShot = ({shot}: Props) => {
     
     const FirstItem = handleFirstItem()
 
-    console.log(FirstItem)
   return (
     <div onClick={() => {onOpenShot();setSelectedShotId(shot.id)}} className='w-full h-full cursor-pointer relative' onMouseEnter={() => setShowTitle(true)} onMouseLeave={() => setShowTitle(false)}>
         {/* <Image src={shot.items[0].content} alt={shot.items[0].extra1} width={400} height={400} className='rounded-lg w-full h-[200px]' /> */}

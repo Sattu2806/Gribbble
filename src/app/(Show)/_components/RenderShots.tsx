@@ -15,8 +15,8 @@ type Props = {}
 export interface ShotDataType extends Upload {
     items:Items[],
     user:{
-        image:string,
-        name:string,
+        image:string  | null,
+        name:string | null,
     }
 }
 
@@ -86,7 +86,6 @@ const RenderShots = (props: Props) => {
             <ShotSkeleton/>
         )
     }
-    console.log("sdcds",UploadData)
 
   return (
     <div className='pt-10'>
