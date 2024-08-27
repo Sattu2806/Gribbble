@@ -199,13 +199,13 @@ export const getUploadDataByInifiteQuerySearch = async (take:string,lastCursor:s
 }
 
 
-export const getMoreShotByUser = async (id:string) => {
+export const getMoreShotByUser = async (id:string,shotId:string) => {
     try {
         const shots = await prisma.upload.findMany({
             where:{
                 userId:id,
                 id:{
-                    not:id
+                    not:shotId
                 }
             },
             include:{

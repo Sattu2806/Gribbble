@@ -33,10 +33,10 @@ const MainView = (props: Props) => {
         queryKey: ['more-shot',ShotData],
         queryFn:async() => {
             if(selectedShotId && ShotData?.user.id){
-                const shot = await getMoreShotByUser(ShotData?.user.id)
-                if(shot)
-                    return shot
+                const shot = await getMoreShotByUser(ShotData?.user.id,ShotData.id)
+                return shot
             }
+            return null
         }
     })
 

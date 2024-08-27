@@ -46,6 +46,7 @@ model User {
   uploads       Upload[]
   followers     Following[] @relation("Followers")
   follwings     Following[] @relation("Following")
+  likes       Like[]
   @@map("users")
 }
  
@@ -72,6 +73,7 @@ model Upload {
   user         User @relation(fields: [userId],references: [id],onDelete: Cascade)
   categoryId   String
   category    category @relation(fields: [categoryId],references: [id])
+  likes       Like[]
 }
 
 model category {
@@ -89,4 +91,15 @@ model Following {
   following   User @relation("Following", fields: [followingId],references: [id])
 
   @@unique([followerId,followingId])
+}
+
+model Like {
+  id          String   @id @default(cuid())
+  userId      String
+  uploadId    String
+  createdAt   DateTime @default(now())
+  user        User @relation(fields: [userId],references: [id])
+  upload      Upload @relation(fields: [uploadId],references: [id])
+
+  @@unique([uploadId,userId])
 }

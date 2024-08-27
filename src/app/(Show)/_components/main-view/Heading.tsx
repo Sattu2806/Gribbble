@@ -7,6 +7,7 @@ import React from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useSelectedShotStore } from '@/hooks/show/use-selected-shot-Id'
+import { hasLikedShot, toggleLikeShot } from '@/actions/like'
 
 interface ShotDataType extends Upload {
     items:Items[]
@@ -29,6 +30,14 @@ const Heading = ({shotData}: Props) => {
         }
     })
 
+    const LikedMutation = useMutation({
+        mutationKey: ['like-toggle'],
+        mutationFn: async () => {
+            if(shotData?.user.id)
+            return await toggleLikeShot(shotData.id)
+        }
+    })
+
     const FollowToggle = () => {
         if(!session.data) {
             router.push('/login')
@@ -37,17 +46,34 @@ const Heading = ({shotData}: Props) => {
         FollowMutation.mutate()
     }
 
+    const LikeToggle = () => {
+        if(!session.data) {
+            router.push('/login')
+            onCloseShot()
+        }
+        LikedMutation.mutate()
+    }
+
     const {data:isFollowCheckData} = useQuery({
         queryKey:['check-follow',FollowMutation.isSuccess],
         queryFn:async() => {
             if(shotData?.user.id){
                 const res = await isFollowing(shotData?.user.id)
-                if(res.success) return res
+                return res
             }
         }
     })
 
-    console.log("isFollowCheckData",isFollowCheckData)
+    const {data:isLikeCheckData} = useQuery({
+        queryKey:['check-like',LikedMutation.isSuccess],
+        queryFn:async() => {
+            if(shotData?.user.id){
+                const res = await hasLikedShot(shotData.id)
+                return res
+            }
+        }
+    })
+
 
 
   return (
@@ -71,8 +97,12 @@ const Heading = ({shotData}: Props) => {
             </div>
         </div>
         <div className='flex items-center space-x-3'>
-            <button className='p-2 flex items-center justify-center rounded-full border-neutral-200 border-[1.5px]'>
-                <Heart size={20} strokeWidth={2}/>
+            <button onClick={LikeToggle} className={`p-2 flex items-center justify-center rounded-full border-neutral-200 border-[1.5px] ${isLikeCheckData ? "bg-pink-200":"border-[1.5px] border-neutral-200"}`}>
+                {LikedMutation.isPending ? (
+                    <LoaderCircle className='animate-spin inline-block w-6 h-6 rounded-full text-pink-400' />
+                ):(
+                    <Heart fill={`${isLikeCheckData ? "#DE3163":"#ffffff"}`} className={`${isLikeCheckData ? "text-pink-500":"text-neutral-800"}`} size={20} strokeWidth={2}/>
+                )}
             </button>
             <button className='p-2 flex items-center justify-center rounded-full border-neutral-200 border-[1.5px]'>
                 <Bookmark size={20} strokeWidth={2}/>
