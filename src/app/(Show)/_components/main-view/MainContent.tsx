@@ -32,17 +32,17 @@ const MainContent = ({shotData}: Props) => {
                 )
             } else if(item.type === 'image'){
                 return (
-                    <Image src={item.content} alt={item.extra1} className={`${item.extra2 === 'large' ? "w-full" :"w-4/5"} mx-auto my-5 rounded-xl`} width={1000} height={1000} />
+                    <Image key={index} src={item.content} alt={item.extra1} className={`${item.extra2 === 'large' ? "w-full" :"w-4/5"} mx-auto my-5 rounded-xl`} width={1000} height={1000} />
                 )
             } else if (item.type === 'video'){
                 return(
-                    <video src={item.content} className={`${item.extra2 === 'large' ? "max-w-screen-lg" :"max-w-screen-md"} mx-auto my-5 rounded-xl`} loop autoPlay muted />
+                    <video key={index} src={item.content} className={`${item.extra2 === 'large' ? "w-full" :"w-4/5"} mx-auto my-5 rounded-xl`} loop autoPlay muted />
                 )
             } else if(item.type === 'gallery'){
                 const  galleryItems = item.content
                 const GalleryObjects: GalleryData[] = JSON.parse(galleryItems)
                 return(
-                    <Carousel>
+                    <Carousel key={index}>
                     <CarouselContent>
                         {GalleryObjects.map((fileObj,index) => (
                             <CarouselItem key={index} className='w-full h-full' style={{width:'100% !important'}}>

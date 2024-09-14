@@ -47,6 +47,10 @@ model User {
   followers     Following[] @relation("Followers")
   follwings     Following[] @relation("Following")
   likes       Like[]
+  comments    Comment[]
+  collections Collection[]
+  saves       Save[]
+  views       View[]
   @@map("users")
 }
  
@@ -74,6 +78,9 @@ model Upload {
   categoryId   String
   category    category @relation(fields: [categoryId],references: [id])
   likes       Like[]
+  comments    Comment[]
+  Save        Save[]
+  views       View[]
 }
 
 model category {
@@ -102,4 +109,49 @@ model Like {
   upload      Upload @relation(fields: [uploadId],references: [id])
 
   @@unique([uploadId,userId])
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  content     String
+  userId      String
+  uploadId    String
+  createdAt   DateTime @default(now())
+  user        User @relation(fields: [userId],references: [id])
+  upload      Upload @relation(fields: [uploadId],references: [id])
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  name        String
+  userId      String
+  createdAt   DateTime @default(now())
+  description String?
+  user        User @relation(fields: [userId],references: [id])
+  saves       Save[]
+}
+
+model Save {
+  id          String   @id @default(cuid())
+  userId      String
+  uploadId    String
+  collectionId  String
+  createdAt   DateTime @default(now())
+
+  user        User @relation(fields: [userId],references: [id])
+  upload      Upload @relation(fields: [uploadId], references: [id])
+  collection  Collection @relation(fields: [collectionId], references: [id])
+
+  @@unique([userId,uploadId])
+}
+
+model View {
+  id          String   @id @default(cuid())
+  userId      String
+  uploadId    String
+
+  user        User @relation(fields: [userId],references: [id])
+  upload      Upload @relation(fields: [uploadId], references: [id])
+
+  @@unique([userId,uploadId])
 }

@@ -1,6 +1,6 @@
 'use client'
 import { useSelectedShotStore } from '@/hooks/show/use-selected-shot-Id'
-import { X } from 'lucide-react'
+import { Info, MessageCircle, Upload, X } from 'lucide-react'
 import React from 'react'
 import {motion, AnimatePresence} from "framer-motion"
 import { useQuery } from '@tanstack/react-query'
@@ -12,11 +12,15 @@ import Image from 'next/image'
 import { getMoreShotByUser } from '@/actions/upload'
 import Link from 'next/link'
 import EachShot from '../EachShot'
+import { useCommentStore } from '@/hooks/show/use-comment'
+import Comments from './Comments'
+import { getAllCommentByShot } from '@/actions/comment'
 
 type Props = {}
 
 const MainView = (props: Props) => {
     const {isShotOpen, onCloseShot, selectedShotId} = useSelectedShotStore()
+    const {isCommentOpen,onOpenComment,onCloseComment} = useCommentStore()
 
     const {isLoading,data:ShotData} = useQuery({
         queryKey: ['shot', selectedShotId],
@@ -40,6 +44,17 @@ const MainView = (props: Props) => {
         }
     })
 
+    const {data:AllCommentData} = useQuery({
+        queryKey:['number-comment',ShotData?.id],
+        queryFn:async() => {
+            if(ShotData?.id){
+                const res = await getAllCommentByShot(ShotData.id)
+                return res
+            }else{
+                return undefined
+            }
+        }
+    })
 
 
   return (
@@ -59,7 +74,7 @@ const MainView = (props: Props) => {
             ):(
                 <div>
                     <div className='flex items-start'>
-                        <div className={`max-w-screen-lg w-2/3 transition-all duration-150 ease-in relative mx-auto`}>
+                        <div className={`max-w-screen-lg w-3/4 transition-all duration-150 ease-in relative ${isCommentOpen ? "px-10 border-r-[1px]":"mx-auto"}`}>
                             <div>
                                 <div className='relative md:py-16 py-6'>
                                     <h1 className='text-2xl font-semibold'>{ShotData?.title}</h1>
@@ -102,7 +117,25 @@ const MainView = (props: Props) => {
                                     </div>
                                 </div>
                             </div>
+                            <div onClick={onCloseComment} className={`p-2 border-[1px] border-neutral-200 rounded-full absolute top-12 -right-4 bg-white ${isCommentOpen ? "":"hidden" }`}>
+                                <X size={14} />
+                            </div>
                         </div>
+                        <Comments data={ShotData}/>
+                    </div>
+                    <div className={`absolute top-1/2 space-y-5 right-5 ${isCommentOpen ? "hidden":"block"}`}>
+                        <button onClick={onOpenComment} className='p-2 border-[1.5px] border-neutral-200 rounded-full block relative'>
+                            <MessageCircle size={20} strokeWidth={2} className='text-neutral-800' />
+                            <div className='absolute -top-2 right-0 rounded-full w-4 h-4 text-xs bg-pink-600 text-white'>
+                                {AllCommentData?.comments?.length}
+                            </div>
+                        </button>
+                        <button  className='p-2 border-[1.5px] border-neutral-200 rounded-full block'>
+                            <Upload size={20} strokeWidth={2} className='text-neutral-800' />
+                        </button>
+                        <button className='p-2 border-[1.5px] border-neutral-200 rounded-full block'>
+                            <Info size={20} strokeWidth={2} className='text-neutral-800' />
+                        </button>
                     </div>
                 </div>
             )}

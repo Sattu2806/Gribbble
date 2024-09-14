@@ -8,8 +8,10 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useSelectedShotStore } from '@/hooks/show/use-selected-shot-Id'
 import { hasLikedShot, toggleLikeShot } from '@/actions/like'
+import { useCollectionStore } from '@/hooks/show/use-collection'
+import { isShotSavedByUser } from '@/actions/collections'
 
-interface ShotDataType extends Upload {
+export interface ShotDataType extends Upload {
     items:Items[]
     user:User
 }
@@ -22,6 +24,7 @@ const Heading = ({shotData}: Props) => {
     const session = useSession()
     const {onCloseShot} = useSelectedShotStore()
     const router = useRouter()
+    const {onOpenCollection,setUploadId,isChanged} = useCollectionStore()
     const FollowMutation = useMutation({
         mutationKey: ['follow-toggle'],
         mutationFn: async () => {
@@ -60,20 +63,35 @@ const Heading = ({shotData}: Props) => {
             if(shotData?.user.id){
                 const res = await isFollowing(shotData?.user.id)
                 return res
+            }else{
+                return null
             }
         }
     })
 
-    const {data:isLikeCheckData} = useQuery({
-        queryKey:['check-like',LikedMutation.isSuccess],
-        queryFn:async() => {
-            if(shotData?.user.id){
-                const res = await hasLikedShot(shotData.id)
-                return res
+    const { data: isLikeCheckData } = useQuery({
+        queryKey: ['check-like', LikedMutation.isSuccess],
+        queryFn: async () => {
+            if (shotData?.user?.id) {
+                const res = await hasLikedShot(shotData.id);
+                return res !== undefined ? res : false; // Ensure a non-undefined value is returned
+            } else {
+                return false; // Explicitly return false if user ID is not available
             }
-        }
-    })
+        },
+        // You can also use an enabled flag to prevent the query from running when not necessary
+        enabled: !!shotData?.user?.id
+    });
+    
 
+    const { data: isShotSaved } = useQuery({
+        queryKey: ['check-save',isChanged],
+        queryFn: async () => {
+            if(shotData?.id)
+                return await isShotSavedByUser(shotData?.id)
+        },
+        enabled: !!shotData?.user?.id
+    });
 
 
   return (
@@ -104,8 +122,12 @@ const Heading = ({shotData}: Props) => {
                     <Heart fill={`${isLikeCheckData ? "#DE3163":"#ffffff"}`} className={`${isLikeCheckData ? "text-pink-500":"text-neutral-800"}`} size={20} strokeWidth={2}/>
                 )}
             </button>
-            <button className='p-2 flex items-center justify-center rounded-full border-neutral-200 border-[1.5px]'>
-                <Bookmark size={20} strokeWidth={2}/>
+            <button onClick={() => {
+                onOpenCollection()
+                if(shotData?.id)
+                    setUploadId(shotData?.id)
+            }} className={` ${isShotSaved?.isSaved ? "bg-pink-200 text-white":"border-[1px] border-neutral-200 rounded-full"} p-2 flex items-center justify-center rounded-full`}>
+                <Bookmark fill={`${isShotSaved?.isSaved ? "#DE3163":"#fff"}`} size={20} strokeWidth={isShotSaved?.isSaved? 0:2}/>
             </button>
             <button className='px-5 py-[10px] rounded-full bg-neutral-950 text-white text-sm'>Get in touch</button>
         </div>

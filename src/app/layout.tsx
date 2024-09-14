@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { SessionProvider } from "next-auth/react";
 import ClientQueryProvider from "@/components/ClientQueryProvider";
 import MainView from "./(Show)/_components/main-view/MainView";
+import CollectionModal from "./(Show)/_components/main-view/Collection-modal";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Toaster />
         <MainView/>
+        <CollectionModal/>
         {children}
       </body>
     </html>
