@@ -10,6 +10,16 @@ import { addComment, getAllCommentByShot } from '@/actions/comment'
 import { useRouter } from 'next/navigation'
 import { useSelectedShotStore } from '@/hooks/show/use-selected-shot-Id'
 import Image from 'next/image'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/components/ui/popover"
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { hasLikedShot, toggleLikeShot } from '@/actions/like'
+import { isShotSavedByUser } from '@/actions/collections'
+import { useCollectionStore } from '@/hooks/show/use-collection'
 
 type Props = {
     data:ShotDataType | undefined
@@ -24,6 +34,7 @@ const Comments = ({data}:Props) => {
     const session = useSession()
     const [commentInput, setCommentInput] = useState<string>()
     const {onCloseShot} = useSelectedShotStore()
+    const {onOpenCollection,setUploadId,isChanged} = useCollectionStore()
     const router = useRouter()
 
     const CommentMutation = useMutation({
@@ -59,19 +70,74 @@ const Comments = ({data}:Props) => {
     }
 
 
+    const LikedMutation = useMutation({
+        mutationKey: ['like-toggle-comment'],
+        mutationFn: async () => {
+            if(data?.user.id)
+            return await toggleLikeShot(data.id)
+        }
+    })
+
+    const LikeToggle = () => {
+        if(!session.data?.user) {
+            router.push('/login')
+            onCloseShot()
+        }
+        LikedMutation.mutate()
+    }
+
+    const { data: isLikeCheckData } = useQuery({
+        queryKey: ['check-like', LikedMutation.isSuccess],
+        queryFn: async () => {
+            if (data?.user?.id) {
+                const res = await hasLikedShot(data.id);
+                return res !== undefined ? res : false; // Ensure a non-undefined value is returned
+            } else {
+                return false; // Explicitly return false if user ID is not available
+            }
+        },
+        // You can also use an enabled flag to prevent the query from running when not necessary
+        enabled: !!data?.user?.id
+    });
+    
+
+    const { data: isShotSaved } = useQuery({
+        queryKey: ['check-save',isChanged],
+        queryFn: async () => {
+            if(data?.id)
+                return await isShotSavedByUser(data?.id)
+        },
+        enabled: !!data?.user?.id
+    });
+
+
+
   return (
     <div className={`${isCommentOpen ? "w-1/4":"w-0 hidden"} mt-10 px-10 overflow-y-scroll`}>
         <div className='flex items-center justify-between'>
             <div className='flex items-center space-x-3'>
-                <button className='p-2 border-[1.5px] border-neutral-200 rounded-full block'>
-                    <Heart size={20} strokeWidth={2} className='text-neutral-800' />
+            <button onClick={LikeToggle} className={`p-2 flex items-center justify-center rounded-full border-neutral-200 border-[1.5px] ${isLikeCheckData ? "bg-pink-200":"border-[1.5px] border-neutral-200"}`}>
+                {LikedMutation.isPending ? (
+                    <LoaderCircle className='animate-spin inline-block w-6 h-6 rounded-full text-pink-400' />
+                ):(
+                    <Heart fill={`${isLikeCheckData ? "#DE3163":"#ffffff"}`} className={`${isLikeCheckData ? "text-pink-500":"text-neutral-800"}`} size={20} strokeWidth={2}/>
+                )}
+            </button>
+                <button onClick={() => {
+                onOpenCollection()
+                if(data?.id)
+                        setUploadId(data?.id)
+                }} className={` ${isShotSaved?.isSaved ? "bg-pink-200 text-white":"border-[1px] border-neutral-200 rounded-full"} p-2 flex items-center justify-center rounded-full`}>
+                    <Bookmark fill={`${isShotSaved?.isSaved ? "#DE3163":"#fff"}`} size={20} strokeWidth={isShotSaved?.isSaved? 0:2}/>
                 </button>
-                <button className='p-2 border-[1.5px] border-neutral-200 rounded-full block'>
-                    <Bookmark size={20} strokeWidth={2} className='text-neutral-800' />
-                </button>
-                <button className='p-2 border-[1.5px] border-neutral-200 rounded-full block'>
-                    <Upload size={20} strokeWidth={2} className='text-neutral-800' />
-                </button>
+                    <Popover>
+                    <PopoverTrigger asChild>
+                        <Button className='p-2 border-[1.5px] border-neutral-200 rounded-full block' variant="outline"><Upload size={20} strokeWidth={2} className='text-neutral-800' /></Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 z-[9999] overflow-x-scroll">
+                        <h1 >{process.env.NEXT_PUBLIC_URL}shot/{data?.id}</h1>
+                    </PopoverContent>
+                    </Popover>
             </div>
             <div>
                 <button className='p-2 border-[1.5px] border-neutral-200 rounded-full block'>

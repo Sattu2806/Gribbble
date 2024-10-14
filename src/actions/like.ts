@@ -32,6 +32,7 @@ export const toggleLikeShot = async(shotId:string) => {
                 }
             })
         } catch (error) {
+            console.log("Error", error)
             throw new Error("Could not liked the shot")
         }
     }else{

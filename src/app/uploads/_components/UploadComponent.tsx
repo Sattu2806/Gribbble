@@ -2,7 +2,6 @@
 import React, { useRef, useState } from 'react'
 import UploadNav from './UploadNav'
 import Firstmedia from './MediaComponents/Firstmedia'
-import TextComp from './TextComponent/TextComp'
 import { useMenuStore } from '@/hooks/use-menu'
 import SideBarMenu from './Menu/SideBarMenu'
 import useUploadDataStore from '@/hooks/use-upload-data'

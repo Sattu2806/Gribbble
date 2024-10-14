@@ -14,6 +14,10 @@ const EachShot = ({shot}: Props) => {
     const [showtitle, setShowTitle] = useState<boolean>(false)
     const {setSelectedShotId,onOpenShot} = useSelectedShotStore()
 
+    function updateLink () {
+      window.history.pushState(null,'',`shot/${shot.id}`)
+    }
+
     const handleFirstItem = () => {
       const firstItem = shot.items[0]
 
@@ -43,7 +47,7 @@ const EachShot = ({shot}: Props) => {
     const FirstItem = handleFirstItem()
 
   return (
-    <div onClick={() => {onOpenShot();setSelectedShotId(shot.id)}} className='w-full h-full cursor-pointer relative' onMouseEnter={() => setShowTitle(true)} onMouseLeave={() => setShowTitle(false)}>
+    <div onClick={() => {onOpenShot();setSelectedShotId(shot.id);updateLink()}} className='w-full h-full cursor-pointer relative' onMouseEnter={() => setShowTitle(true)} onMouseLeave={() => setShowTitle(false)}>
         {/* <Image src={shot.items[0].content} alt={shot.items[0].extra1} width={400} height={400} className='rounded-lg w-full h-[200px]' /> */}
         {FirstItem && FirstItem.content && FirstItem.type === 'image' && (
           <Image src={FirstItem.content} alt={FirstItem.content} width={400} height={400} className='rounded-lg w-full h-[200px]' />

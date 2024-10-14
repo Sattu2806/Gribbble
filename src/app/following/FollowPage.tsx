@@ -4,10 +4,10 @@ import React, { useEffect } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { getUploadDataByInifiteQuery } from '@/actions/upload'
 import { Button } from '@/components/ui/button'
-import EachShot from './EachShot'
+import EachShot from '../(Show)/_components/EachShot'
 import { useInView } from "react-intersection-observer";
 import Image from 'next/image'
-import ShotSkeleton from './ShotSkeleton'
+import ShotSkeleton from '../(Show)/_components/ShotSkeleton'
 import { useSearchParams } from 'next/navigation'
 
 type Props = {}
@@ -37,7 +37,7 @@ export type FetchUploadDataResponse  = {
     error?:string
 }
 
-const RenderShots = (props: Props) => {
+const FollowPage = (props: Props) => {
     const { ref, inView } = useInView();
     const searchParams = useSearchParams()
     const categoryId = searchParams.get('category')
@@ -45,7 +45,7 @@ const RenderShots = (props: Props) => {
 
     const fetchUploadData = async (take:string, lastCursor:string) => {
         try {
-            const response = await getUploadDataByInifiteQuery(take,lastCursor,categoryId,queryTag,false)
+            const response = await getUploadDataByInifiteQuery(take,lastCursor,categoryId,queryTag,true)
             if(response && 'data' in response){
                 const {data} = response
                 return data
@@ -115,4 +115,4 @@ const RenderShots = (props: Props) => {
   )
 }
 
-export default RenderShots
+export default FollowPage

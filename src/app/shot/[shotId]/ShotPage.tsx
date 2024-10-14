@@ -1,19 +1,21 @@
 'use client'
+import Navbar from '@/app/(Show)/_components/Nav/Navbar'
+import Container from '@/components/Container'
 import { useSelectedShotStore } from '@/hooks/show/use-selected-shot-Id'
 import { Info, MessageCircle, Upload, X } from 'lucide-react'
 import React from 'react'
 import {motion, AnimatePresence} from "framer-motion"
 import { useQuery } from '@tanstack/react-query'
 import { getShotById } from '@/actions/shot'
-import MainViewSkeleton from './MainViewSkeleton'
-import Heading from './Heading'
-import MainContent from './MainContent'
+import MainViewSkeleton from '@/app/(Show)/_components/main-view/MainViewSkeleton'
+import Heading from '@/app/(Show)/_components/main-view/Heading'
+import MainContent from '@/app/(Show)/_components/main-view/MainContent'
 import Image from 'next/image'
 import { getMoreShotByUser } from '@/actions/upload'
 import Link from 'next/link'
-import EachShot from '../EachShot'
+import EachShot from '@/app/(Show)/_components/EachShot'
 import { useCommentStore } from '@/hooks/show/use-comment'
-import Comments from './Comments'
+import Comments from '@/app/(Show)/_components/main-view/Comments'
 import { getAllCommentByShot } from '@/actions/comment'
 import {
     Popover,
@@ -24,15 +26,14 @@ import { Button } from '@/components/ui/button'
 
 type Props = {}
 
-const MainView = (props: Props) => {
-    const {isShotOpen, onCloseShot, selectedShotId} = useSelectedShotStore()
+const ShotPage = ({params}:{params:{shotId:string}}) => {
     const {isCommentOpen,onOpenComment,onCloseComment} = useCommentStore()
 
     const {isLoading,data:ShotData} = useQuery({
-        queryKey: ['shot', selectedShotId],
+        queryKey: ['shot-indi', params.shotId],
         queryFn:async() => {
-            if(selectedShotId){
-                const shot = await getShotById(selectedShotId)
+            if(params.shotId){
+                const shot = await getShotById(params.shotId)
                 if(shot)
                     return shot
             }
@@ -40,9 +41,9 @@ const MainView = (props: Props) => {
     })
 
     const {isLoading:MoreShotLoading,data:MoreShotData} = useQuery({
-        queryKey: ['more-shot',ShotData],
+        queryKey: ['more-shot-indi',ShotData],
         queryFn:async() => {
-            if(selectedShotId && ShotData?.user.id){
+            if(params.shotId && ShotData?.user.id){
                 const shot = await getMoreShotByUser(ShotData?.user.id,ShotData.id)
                 return shot
             }
@@ -51,7 +52,7 @@ const MainView = (props: Props) => {
     })
 
     const {data:AllCommentData} = useQuery({
-        queryKey:['number-comment',ShotData?.id],
+        queryKey:['number-comment-indi',ShotData?.id],
         queryFn:async() => {
             if(ShotData?.id){
                 const res = await getAllCommentByShot(ShotData.id)
@@ -61,24 +62,11 @@ const MainView = (props: Props) => {
             }
         }
     })
-
-    function backlink () {
-        window.history.back()
-    }
-
-
   return (
-    <AnimatePresence>
-        {isShotOpen && (
-        <motion.div
-        initial={{ translateY: 1000, scale: 0.9, opacity: 0.7 }}
-        animate={{ opacity: 1, translateY: 0, scale: 1 }}
-        exit={{opacity:0,translateY:1000}}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className={`fixed max-md:top-0 max-md:left-0 bottom-0 max-md:right-0 md:h-[97vh] md:w-full md:rounded-t-[40px] bg-white z-[100] shadow-main-view overflow-y-auto`}>
-            <div onClick={()=>{onCloseShot();backlink()}} className='fixed top-0 right-4 cursor-pointer'>
-                <X className='text-white' size={24} />
-            </div>
+    <div>
+        <Navbar/>
+        <Container>
+            <div>
             {isLoading ? (
                 <MainViewSkeleton/>
             ):(
@@ -154,10 +142,10 @@ const MainView = (props: Props) => {
                     </div>
                 </div>
             )}
-        </motion.div>
-        )}
-    </AnimatePresence>
+            </div>
+        </Container>
+    </div>
   )
 }
 
-export default MainView
+export default ShotPage

@@ -51,12 +51,23 @@ export const makeUpload = async (values:ShotType) => {
 }
 
 
-export const getUploadDataByInifiteQuery = async (take:string,lastCursor:string,categoryId:string | null,queryTag:string | null) => {
+export const getUploadDataByInifiteQuery = async (take:string,lastCursor:string,categoryId:string | null,queryTag:string | null,isFollowing:boolean) => {
+    const session = await auth()
     try {
+        let followedUserId : string[] = [];
+        if(isFollowing && session?.user){
+            const follows = await prisma.following.findMany({
+                where:{followerId: session.user.id},
+                select:{followingId:true}
+            })
+
+            followedUserId = follows.map((follow) => follow.followingId)
+        }
         const shots = await prisma.upload.findMany({
             where:{
                 ...(categoryId && {categoryId: categoryId}),
-                ...(queryTag && {tags : {has:queryTag}})
+                ...(queryTag && {tags : {has:queryTag}}),
+                ...(followedUserId.length && {userId: {in:followedUserId}})
             },
             include:{
                 items:true,

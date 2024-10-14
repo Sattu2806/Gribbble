@@ -42,7 +42,7 @@ const Heading = ({shotData}: Props) => {
     })
 
     const FollowToggle = () => {
-        if(!session.data) {
+        if(!session.data?.user) {
             router.push('/login')
             onCloseShot()
         }
@@ -50,7 +50,7 @@ const Heading = ({shotData}: Props) => {
     }
 
     const LikeToggle = () => {
-        if(!session.data) {
+        if(!session.data?.user) {
             router.push('/login')
             onCloseShot()
         }

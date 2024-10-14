@@ -1,11 +1,11 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {motion} from "framer-motion"
 import OtherFilter from './OtherFilter'
 import { useQuery } from '@tanstack/react-query'
 import { getAllCategories } from '@/actions/category'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 type Props = {}
@@ -15,8 +15,20 @@ const BottomBar = (props: Props) => {
     const [showFilter, setshowFilter] = useState<boolean>(false)
     const [otherFilter, setotherFilter] = useState<boolean>(false)
     const [activeItem, setActiveItem] = useState<string>('Following')
+    const pathname = usePathname()
+
+    useEffect(() => {
+        if (pathname === '/following') {
+            setActiveItem('Following')
+        }
+        if(pathname === 'upload-new'){
+            setActiveItem('New & NoteWorthy')
+        }
+    },[pathname])
     const searchParams = useSearchParams()
     const categoryId = searchParams.get('category')
+
+    console.log("pathname",pathname)
 
     const handleFilter = () => {
         setIsRoated(!isRotated)
