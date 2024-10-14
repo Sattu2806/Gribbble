@@ -83,7 +83,7 @@ const BottomBar = (props: Props) => {
                         ))
                     ):(
                         categories?.map((category,index) => (
-                            <li className={` ${categoryId === category.value ? "bg-neutral-100":""} p-2 hover:text-neutral-800 rounded-full`}>
+                            <li key={index} className={` ${categoryId === category.value ? "bg-neutral-100":""} p-2 hover:text-neutral-800 rounded-full`}>
                                 <Link href={`?category=${category.value}`}>{category.label}</Link>
                             </li>
                         ))
@@ -107,7 +107,7 @@ const BottomBar = (props: Props) => {
                         ))
                     ):(
                         categories?.map((category,index) => (
-                            <li className={` ${categoryId === category.value ? "bg-neutral-100":""} p-2 hover:text-neutral-800 rounded-full`}>
+                            <li key={index} className={` ${categoryId === category.value ? "bg-neutral-100":""} p-2 hover:text-neutral-800 rounded-full`}>
                                 <Link href={`?category=${category.value}`}>{category.label}</Link>
                             </li>
                         ))

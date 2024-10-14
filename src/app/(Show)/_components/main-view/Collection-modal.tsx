@@ -160,7 +160,7 @@ const ChooseCollection = () => {
                 </div>
                 <div className='max-h-[300px] overflow-y-scroll'>
                     {filteredCollection && filteredCollection.map((fillcollection) => (
-                        <CollectionShow id={fillcollection.id}/>
+                        <CollectionShow id={fillcollection.id} key={fillcollection.id}/>
                     ))}
                 </div>
             </div>

@@ -48,7 +48,7 @@ const ShowCollections = (props: Props) => {
                 
                 const FirstItem = handleFirstItem()
                 return(
-                    <div>
+                    <div key={collection.id}>
                         {FirstItem && FirstItem.content && FirstItem.type === 'image' && (
                         <Image src={FirstItem.content} alt={FirstItem.content} width={400} height={400} className='rounded-lg w-full h-[200px]' />
                         )}

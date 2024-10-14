@@ -12,21 +12,24 @@ type Props = {
 const HeadingTextMenu = ({open,setOpen,editor}: Props) => {
   const {setSelectedText} = useHeadingStore()
 
+
+
+  useEffect(() => {
+    if(editor){
+      if(editor.isActive('heading', {level:1})){
+        setSelectedText('Heading 1')
+      } else if(editor.isActive('heading', {level:2})){
+        setSelectedText('Heading 2')
+      } else if(editor.isActive('paragraph')){
+        setSelectedText('Body')
+      }
+    }
+
+  },[editor])
+
   if(!editor){
     return null
   }
-
-  useEffect(() => {
-
-    if(editor.isActive('heading', {level:1})){
-      setSelectedText('Heading 1')
-    } else if(editor.isActive('heading', {level:2})){
-      setSelectedText('Heading 2')
-    } else if(editor.isActive('paragraph')){
-      setSelectedText('Body')
-    }
-
-  },[editor,editor.isActive('heading', {level:1}),editor.isActive('heading', {level:2}),editor.isActive('paragraph')])
 
 
   return (

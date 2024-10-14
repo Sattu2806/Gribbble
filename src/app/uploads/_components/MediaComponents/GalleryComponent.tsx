@@ -251,6 +251,7 @@ const handleFile = async (files: FileList) => {
                 <div className='flex items-center space-x-3'>
                     {GalleryObjects.length>0 && GalleryObjects.map((fileObj, index) => (
                         <div
+                            key={index}
                             onClick={() => {
                                 setSelectedSlideIndex(index)
                                 if(api){

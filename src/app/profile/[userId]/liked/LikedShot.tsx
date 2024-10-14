@@ -30,7 +30,7 @@ const LikedShot = (props: Props) => {
     <div className='pt-10 max-w-screen-xl mx-auto'>
         <div className='grid gap-10 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1'>
             {LikedShotData?.map((shot) => (
-                <EachLikedShot shot={shot}/>
+                <EachLikedShot shot={shot} key={shot.id}/>
             ))}
         </div>
     </div>
