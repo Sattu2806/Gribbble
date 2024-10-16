@@ -57,12 +57,12 @@ const EachShot = ({shot}: Props) => {
         )}
         <div className='pt-2 flex items-center justify-between w-full'>
           <div className='flex items-center space-x-1 relative w-full'>
-            {shot.user.image ? (
+            {shot.user?.image && shot.user.image ? (
               <Image src={shot.user.image} className='rounded-full object-cover' width={20} height={20} alt='Author' />
             ):(
-              <p className='text-xs w-5 h-5 flex items-center justify-center bg-orange-500 text-white rounded-full'>{shot.user.name?.charAt(0)}</p>
+              <p className='text-xs w-5 h-5 flex items-center justify-center bg-orange-500 text-white rounded-full'>{shot.user?.name?.charAt(0)}</p>
             )}
-            <p className='text-xs font-medium'>{shot.user.name}</p>
+            <p className='text-xs font-medium'>{shot.user?.name}</p>
           </div>
           <div className='flex items-center space-x-1 text-neutral-500'>
               <div className='flex items-center space-x-1'>
